@@ -13,7 +13,7 @@ function ShoppingItemList() {
     const fetchProducts = async () => {
       const response = await fetch('http://localhost:8000/v1/products');
       const data = await response.json();
-      setProducts(Array.isArray(data) ? data : data.products ?? []);
+      setProducts(data);
     };
     fetchProducts();
   }, [])
