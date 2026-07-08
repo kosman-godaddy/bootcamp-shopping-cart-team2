@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import confetti from 'canvas-confetti';
 import {
   Typography, Button, Box, Divider, Stack, Snackbar, Alert,
   TextField, RadioGroup, FormControlLabel, Radio, FormLabel, FormControl, Paper,
@@ -19,7 +20,7 @@ function Cart() {
   const [loading, setLoading] = useState(true);
   const [snackOpen, setSnackOpen] = useState(false);
   const [checkingOut, setCheckingOut] = useState(false);
-  const [form, setForm] = useState({ name: '', email: '', phone: '', payment: 'card' });
+  const [form, setForm] = useState({ name: '', email: '', phone: '', payment: 'card' });  // Personal information form state
 
   const fetchItems = async () => {
     const [cartRes, productRes] = await Promise.all([
@@ -62,13 +63,25 @@ function Cart() {
     setCheckingOut(true);
   };
 
+  const fireConfetti = () => { // Function to fire confetti animation - Ian
+    const duration = 3000;
+    const end = Date.now() + duration;
+    const frame = () => {
+      confetti({ particleCount: 6, angle: 60, spread: 55, origin: { x: 0 } });
+      confetti({ particleCount: 6, angle: 120, spread: 55, origin: { x: 1 } });
+      if (Date.now() < end) requestAnimationFrame(frame);
+    };
+    frame();
+  };
+
   const handlePlaceOrder = async () => {
     await Promise.all(items.map((item) =>
       fetch(`http://localhost:8000/v1/cartitems/${item.id}`, { method: 'DELETE' })
     ));
     setItems([]);
     setCheckingOut(false);
-    setSnackOpen(true);
+    setSnackOpen(true); //Stay on shop page and show snackbar notification after order is placed - Ian
+    fireConfetti(); //confetti animation after order is placed - Ian
   };
 
   const subtotal = items.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0); // sum of all item prices × their quantities before any discount
