@@ -23,8 +23,8 @@ function WrappedApp({ Component, pageProps }) {
 
   const theme = useMemo(() => createTheme({ palette: { mode } }), [mode]);
 
-  return (
-    <FavoritesProvider>
+  return ( // calls useFavorites so the hearts on shop/favorite page match up -Nyla
+    <FavoritesProvider> 
       <ColorModeContext.Provider value={colorMode}>
         <ThemeProvider theme={theme}>
           <CssBaseline />

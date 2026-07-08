@@ -8,13 +8,13 @@ import ShopItem from '../components/ShopItem';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import DarkModeToggle from '../components/DarkModeToggle';
 
-export const ShopPage = () => (
+export const ShopPage = () => ( // main shop page, displays hearts for favorited items -Nyla
   <Box sx={{ bgcolor: 'background.default', minHeight: '100vh' }}>
     <Box sx={{ bgcolor: 'background.paper', borderBottom: '1px solid', borderColor: 'divider', py: 2 }}>
       <Container maxWidth="lg" sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography variant="h5" fontWeight={700} color="text.primary">
           My Shop
-        </Typography>
+        </Typography> 
         <Box sx={{ display: 'flex', gap: 1 }}>
           <Link href="/favorites" passHref>
             <Button variant="outlined" startIcon={<FavoriteBorderIcon />} size="small">
