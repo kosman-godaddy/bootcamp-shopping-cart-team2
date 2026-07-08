@@ -29,6 +29,7 @@ export const ShopPage = () => (
             </Button>
           </Link>
         </Box>
+        </Box>
       </Container>
     </Box>
     <Container maxWidth="lg" sx={{ py: 4 }}>

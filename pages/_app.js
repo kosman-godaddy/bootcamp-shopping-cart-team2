@@ -14,10 +14,6 @@ import '@fontsource/roboto/700.css'
 export const ColorModeContext = createContext({ mode: 'light', toggleColorMode: () => {} });
 
 function WrappedApp({ Component, pageProps }) {
-  return (
-    <FavoritesProvider>
-      <Component { ...pageProps } />
-    </FavoritesProvider>
   const [mode, setMode] = useState('light');
 
   const colorMode = useMemo(() => ({
@@ -28,23 +24,25 @@ function WrappedApp({ Component, pageProps }) {
   const theme = useMemo(() => createTheme({ palette: { mode } }), [mode]);
 
   return (
-    <ColorModeContext.Provider value={colorMode}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <Component {...pageProps} />
-        <img
-          src="/godaddy-logo.png"
-          alt="GoDaddy"
-          style={{
-            position: 'fixed',
-            bottom: '16px',
-            right: '16px',
-            width: '120px',
-            zIndex: 9999,
-          }}
-        />
-      </ThemeProvider>
-    </ColorModeContext.Provider>
+    <FavoritesProvider>
+      <ColorModeContext.Provider value={colorMode}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <Component {...pageProps} />
+          <img
+            src="/godaddy-logo.png"
+            alt="GoDaddy"
+            style={{
+              position: 'fixed',
+              bottom: '16px',
+              right: '16px',
+              width: '120px',
+              zIndex: 9999,
+            }}
+          />
+        </ThemeProvider>
+      </ColorModeContext.Provider>
+    </FavoritesProvider>
   );
 }
 
