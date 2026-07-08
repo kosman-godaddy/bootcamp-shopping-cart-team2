@@ -13,10 +13,10 @@ function ShopItem({ product, onAddToCart }) {
   const image = product.image_url || productImages[product.id];
   const onSale = product.is_on_sale && product.sale_price != null;
 
-  const [toastOpen, setToastOpen] = React.useState(false);
-  const [toastMessage, setToastMessage] = React.useState('');
+  const [toastOpen, setToastOpen] = React.useState(false); // Notification for adding to cart - Ian
+  const [toastMessage, setToastMessage] = React.useState(''); // Notification for adding to cart - Ian
 
-  const handleAddToCartClick =  async() => {
+  const handleAddToCartClick =  async() => { // Notification for adding to cart - Ian
     console.log('Button clicked!');
     onAddToCart(product);
     setToastMessage(`${product.name} has been added to your cart.`);
@@ -97,7 +97,7 @@ function ShopItem({ product, onAddToCart }) {
 
       <CardActions sx={{ px: 2, pb: 2, pt: 1 }}>
         <Button
-          onClick={handleAddToCartClick}
+          onClick={handleAddToCartClick} //When clicked, calls the handleAddToCartClick function, which will call the onAddToCart function passed as a prop and show a toast notification. -Ian
           variant="contained"
           fullWidth
           size="small"
@@ -109,7 +109,7 @@ function ShopItem({ product, onAddToCart }) {
     </Card>
 
     
-    <Snackbar
+    <Snackbar //Notification for adding to cart - Ian
       open={toastOpen}
       autoHideDuration={3000}
       onClose={() => setToastOpen(false)}
