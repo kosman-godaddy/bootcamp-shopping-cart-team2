@@ -4,6 +4,7 @@ import Link from 'next/link';
 import ShoppingItemList from '../components/ShopItemList';
 import { Container, Typography, Button, Box, Divider } from '@mui/material';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
+import ShopItem from '../components/ShopItem';
 
 export const ShopPage = () => (
   <Box sx={{ backgroundColor: '#f5f5f5', minHeight: '100vh' }}>

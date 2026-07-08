@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardContent, CardActions, CardMedia, Typography, Button, Chip, Box } from '@mui/material';
+import { Card, CardContent, CardActions, CardMedia, Snackbar, Alert, Typography, Button, Chip, Box } from '@mui/material';
 
 const productImages = {
   1: 'https://images.unsplash.com/photo-1582139329536-e7284fece509?w=400&h=200&fit=crop', // padlock close-up
@@ -13,7 +13,23 @@ function ShopItem({ product, onAddToCart }) {
   const image = product.image_url || productImages[product.id];
   const onSale = product.is_on_sale && product.sale_price != null;
 
+  const [toastOpen, setToastOpen] = React.useState(false);
+  const [toastMessage, setToastMessage] = React.useState('');
+
+  const handleAddToCartClick =  async() => {
+    console.log('Button clicked!');
+    onAddToCart(product);
+    setToastMessage(`${product.name} has been added to your cart.`);
+    setToastOpen(true);
+
+    setTimeout(() => {
+      setToastOpen(false);
+    }, 3000);
+  };
+
+
   return (
+    <>
     <Card sx={{
       width: 220,
       m: '12px',
@@ -81,7 +97,7 @@ function ShopItem({ product, onAddToCart }) {
 
       <CardActions sx={{ px: 2, pb: 2, pt: 1 }}>
         <Button
-          onClick={() => onAddToCart(product)}
+          onClick={handleAddToCartClick}
           variant="contained"
           fullWidth
           size="small"
@@ -91,7 +107,21 @@ function ShopItem({ product, onAddToCart }) {
         </Button>
       </CardActions>
     </Card>
-  );
+
+    
+    <Snackbar
+      open={toastOpen}
+      autoHideDuration={3000}
+      onClose={() => setToastOpen(false)}
+      anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+    >
+      <Alert onClose={() => setToastOpen(false)} severity="success" sx={{ width: '100%' }}>
+        {toastMessage}
+      </Alert>
+    </Snackbar>
+  </>
+);
 }
+
 
 export default ShopItem;

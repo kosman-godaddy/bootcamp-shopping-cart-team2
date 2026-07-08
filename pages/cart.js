@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Container, Typography, Button, Box } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Cart from '../components/Cart';
+import CartItem from '../components/CartItem';
 
 export const CartPage = () => (
   <Box sx={{ backgroundColor: '#f5f5f5', minHeight: '100vh' }}>

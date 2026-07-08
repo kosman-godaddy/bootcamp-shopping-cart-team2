@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Grid } from '@mui/material'
-import { useRouter } from 'next/router'
 import ShopItem from './ShopItem';
 
 function ShoppingItemList() {
 
   
   const [products, setProducts] = useState([]);
-  const router = useRouter()
-
   useEffect(() => {
     const fetchProducts = async () => {
       const response = await fetch('http://localhost:8000/v1/products');
@@ -47,7 +44,6 @@ function ShoppingItemList() {
     });
   }
 
-  router.push('/cart');
 };
 
   return (
