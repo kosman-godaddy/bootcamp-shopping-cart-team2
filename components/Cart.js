@@ -15,7 +15,7 @@ function Cart() {
   const [loading, setLoading] = useState(true);
   const [snackOpen, setSnackOpen] = useState(false);
   const [checkingOut, setCheckingOut] = useState(false);
-  const [form, setForm] = useState({ name: '', email: '', phone: '', payment: 'card' });
+  const [form, setForm] = useState({ name: '', email: '', phone: '', payment: 'card' });  // Personal information form state
 
   const fetchItems = async () => {
     const [cartRes, productRes] = await Promise.all([
