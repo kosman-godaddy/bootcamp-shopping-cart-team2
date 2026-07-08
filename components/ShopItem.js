@@ -107,7 +107,7 @@ function ShopItem({ product, onAddToCart }) {
 
         {onSale ? (
           <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
-            <Typography variant="h6" fontWeight={700} color="text.primary">
+            <Typography variant="h6" fontWeight={700} color="error.main">
               ${Number(product.sale_price).toFixed(2)}
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ textDecoration: 'line-through' }}>
