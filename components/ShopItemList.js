@@ -38,7 +38,12 @@ function ShoppingItemList() {
     await fetch('http://localhost:8000/v1/cartitems', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: product.name, price: product.price, quantity: 1 }),
+      body: JSON.stringify({
+          name: product.name,
+          price: product.is_on_sale && product.sale_price != null ? product.sale_price : product.price,
+          original_price: product.is_on_sale && product.sale_price != null ? product.price : null,
+          quantity: 1,
+        }),
     });
   }
 

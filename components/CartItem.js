@@ -18,9 +18,16 @@ function CartItem({ item, onRemove, onUpdateQuantity }) {
         <Typography variant="subtitle1" fontWeight={600} noWrap>
           {item.name}
         </Typography>
-        <Typography variant="body2" color="text.secondary">
-          ${Number(item.price).toFixed(2)} each
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
+          <Typography variant="body2" color="text.secondary">
+            ${Number(item.price).toFixed(2)} each
+          </Typography>
+          {item.original_price != null && (
+            <Typography variant="body2" color="text.disabled" sx={{ textDecoration: 'line-through' }}>
+              ${Number(item.original_price).toFixed(2)}
+            </Typography>
+          )}
+        </Box>
       </Box>
 
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>

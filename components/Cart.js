@@ -6,17 +6,31 @@ import CartItem from './CartItem';
 
 function Cart() {
   const [items, setItems] = useState([]);
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [snackOpen, setSnackOpen] = useState(false);
 
   const fetchItems = async () => {
-    const response = await fetch('http://localhost:8000/v1/cartitems');
-    const data = await response.json();
-    setItems(Array.isArray(data) ? data : data.cartItems ?? []);
+    const [cartRes, productRes] = await Promise.all([
+      fetch('http://localhost:8000/v1/cartitems'),
+      fetch('http://localhost:8000/v1/products'),
+    ]);
+    const cartData = await cartRes.json();
+    const productData = await productRes.json();
+    setItems(Array.isArray(cartData) ? cartData : cartData.cartItems ?? []);
+    setProducts(Array.isArray(productData) ? productData : productData.products ?? []);
     setLoading(false);
   };
 
   useEffect(() => { fetchItems(); }, []);
+
+  const getOriginalPrice = (item) => {
+    const product = products.find((p) => p.name === item.name);
+    if (product && product.is_on_sale && product.sale_price != null) {
+      return product.price;
+    }
+    return null;
+  };
 
   const handleRemove = async (id) => {
     await fetch(`http://localhost:8000/v1/cartitems/${id}`, { method: 'DELETE' });
@@ -76,7 +90,7 @@ function Cart() {
             {items.map((item) => (
               <CartItem
                 key={item.id}
-                item={item}
+                item={{ ...item, original_price: getOriginalPrice(item) }}
                 onRemove={handleRemove}
                 onUpdateQuantity={handleUpdateQuantity}
               />
