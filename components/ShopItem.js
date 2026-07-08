@@ -1,5 +1,8 @@
 import React from 'react';
-import { Card, CardContent, CardActions, CardMedia, Snackbar, Alert, Typography, Button, Chip, Box } from '@mui/material';
+import { Card, CardContent, CardActions, CardMedia, Snackbar, Alert, Typography, Button, Chip, Box, IconButton } from '@mui/material';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import { useFavorites } from '../context/FavoritesContext';
 
 const productImages = {
   1: 'https://images.unsplash.com/photo-1582139329536-e7284fece509?w=400&h=200&fit=crop', // padlock close-up
@@ -15,6 +18,12 @@ function ShopItem({ product, onAddToCart }) {
 
   const [toastOpen, setToastOpen] = React.useState(false);
   const [toastMessage, setToastMessage] = React.useState('');
+  const { toggleFavorite, isFavorited: checkFavorited } = useFavorites();
+  const isFavorited = checkFavorited(product.id);
+
+  const handleFavoriteClick = () => {
+    toggleFavorite(product);
+  };
 
   const handleAddToCartClick =  async() => {
     console.log('Button clicked!');
@@ -42,23 +51,40 @@ function ShopItem({ product, onAddToCart }) {
         transform: 'translateY(-2px)',
       },
     }}>
-      <Box sx={{ position: 'relative' }}>
-        <CardMedia
-          component="img"
-          height="160"
-          image={image}
-          alt={product.name}
-          sx={{ objectFit: 'cover', backgroundColor: '#f5f5f5' }}
-        />
-        {onSale && (
-          <Chip
-            label="Sale"
-            color="error"
-            size="small"
-            sx={{ position: 'absolute', top: 8, right: 8, fontWeight: 700 }}
-          />
-        )}
-      </Box>
+    <Box sx={{ position: 'relative' }}>
+   <CardMedia
+    component="img"
+    height="160"
+    image={image}
+    alt={product.name}
+    sx={{ objectFit: 'cover', backgroundColor: '#f5f5f5' }}
+  />
+  {onSale && (
+    <Chip
+      label="Sale"
+      color="error"
+      size="small"
+      sx={{ position: 'absolute', top: 8, right: 8, fontWeight: 700 }}
+    />
+  )}
+  <IconButton
+    onClick={handleFavoriteClick}
+    size="small"
+    sx={{
+      position: 'absolute',
+      top: 8,
+      left: 8,
+      backgroundColor: 'rgba(255,255,255,0.85)',
+      '&:hover': { backgroundColor: 'rgba(255,255,255,1)' },
+    }}
+  >
+    {isFavorited ? (
+      <FavoriteIcon fontSize="small" sx={{ color: '#e53935' }} />
+    ) : (
+      <FavoriteBorderIcon fontSize="small" sx={{ color: '#666' }} />
+    )}
+  </IconButton>
+  </Box>
 
       <CardContent sx={{ flexGrow: 1, pb: 0 }}>
         <Typography variant="subtitle1" fontWeight={600} noWrap gutterBottom>

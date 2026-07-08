@@ -5,6 +5,7 @@ import ShoppingItemList from '../components/ShopItemList';
 import { Container, Typography, Button, Box, Divider } from '@mui/material';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import ShopItem from '../components/ShopItem';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 
 export const ShopPage = () => (
   <Box sx={{ backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
@@ -13,11 +14,19 @@ export const ShopPage = () => (
         <Typography variant="h5" fontWeight={700} color="text.primary">
           My Shop
         </Typography>
-        <Link href="/cart" passHref>
-          <Button variant="outlined" startIcon={<ShoppingCartOutlinedIcon />} size="small">
-            View Cart
-          </Button>
-        </Link>
+
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <Link href="/favorites" passHref>
+            <Button variant="outlined" startIcon={<FavoriteBorderIcon />} size="small">
+              Favorites
+            </Button>
+          </Link>
+          <Link href="/cart" passHref>
+            <Button variant="outlined" startIcon={<ShoppingCartOutlinedIcon />} size="small">
+              View Cart
+            </Button>
+          </Link>
+        </Box>
       </Container>
     </Box>
     <Container maxWidth="lg" sx={{ py: 4 }}>
