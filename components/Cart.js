@@ -6,13 +6,13 @@ import {
   TextField, RadioGroup, FormControlLabel, Radio, FormLabel, FormControl, Paper,
   LinearProgress,
 } from '@mui/material';
-import LocalOfferIcon from '@mui/icons-material/LocalOffer'; // tag icon shown inside the progress bar banner
+import LocalOfferIcon from '@mui/icons-material/LocalOffer'; // tag icon shown inside the progress bar banner -Ahmed
 import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CartItem from './CartItem';
 
-const DISCOUNT_THRESHOLD = 200; // the cart subtotal (in $) the user must reach to unlock 50% off
-const DISCOUNT_RATE = 0.5;      // the fraction taken off the subtotal once the threshold is met
+const DISCOUNT_THRESHOLD = 200; // the cart subtotal (in $) the user must reach to unlock 50% off -Ahmed
+const DISCOUNT_RATE = 0.5;      // the fraction taken off the subtotal once the threshold is met -Ahmed
 
 function Cart() {
   const [items, setItems] = useState([]);
@@ -84,11 +84,11 @@ function Cart() {
     fireConfetti(); //confetti animation after order is placed - Ian
   };
 
-  const subtotal = items.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0); // sum of all item prices × their quantities before any discount
-  const discountUnlocked = subtotal >= DISCOUNT_THRESHOLD; // true once the cart hits $200 — flips the bar green and halves the total
-  const total = discountUnlocked ? subtotal * (1 - DISCOUNT_RATE) : subtotal; // final price shown to the user: half the subtotal if discount is active, otherwise unchanged
-  const progressPct = Math.min((subtotal / DISCOUNT_THRESHOLD) * 100, 100); // 0–100 value that drives the LinearProgress bar fill; capped at 100 so it never overflows
-  const amountToGo = Math.max(DISCOUNT_THRESHOLD - subtotal, 0); // how many more dollars the user needs to spend; floors at 0 so it never goes negative
+  const subtotal = items.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0); // sum of all item prices × their quantities before any discount -Ahmed
+  const discountUnlocked = subtotal >= DISCOUNT_THRESHOLD; // true once the cart hits $200 — flips the bar green and halves the total -Ahmed
+  const total = discountUnlocked ? subtotal * (1 - DISCOUNT_RATE) : subtotal; // final price shown to the user: half the subtotal if discount is active, otherwise unchanged -Ahmed
+  const progressPct = Math.min((subtotal / DISCOUNT_THRESHOLD) * 100, 100); // 0–100 value that drives the LinearProgress bar fill; capped at 100 so it never overflows -Ahmed
+  const amountToGo = Math.max(DISCOUNT_THRESHOLD - subtotal, 0); // how many more dollars the user needs to spend; floors at 0 so it never goes negative -Ahmed
 
   if (loading) return null;
 
@@ -122,13 +122,13 @@ function Cart() {
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
             Order total:{' '}
-            {/* strikethrough original price shown on the checkout form only when discount is active */}
+            {/* strikethrough original price shown on the checkout form only when discount is active -Ahmed */}
             {discountUnlocked && (
               <span style={{ textDecoration: 'line-through', marginRight: 6 }}>${subtotal.toFixed(2)}</span>
             )}
-            {/* discounted (or regular) total carried through from the cart page */}
+            {/* discounted (or regular) total carried through from the cart page -Ahmed */}
             <strong>${total.toFixed(2)}</strong>
-            {/* confirmation label so the user knows the 50% was actually applied at checkout */}
+            {/* confirmation label so the user knows the 50% was actually applied at checkout -Ahmed */}
             {discountUnlocked && <span style={{ color: 'green', marginLeft: 6 }}>(50% off applied)</span>}
           </Typography>
 
@@ -228,10 +228,10 @@ function Cart() {
           </Stack>
           <Divider sx={{ my: 3 }} />
 
-          {/* 50% off progress bar — whole banner turns green when the discount is unlocked */}
+          {/* 50% off progress bar — whole banner turns green when the discount is unlocked -Ahmed */}
           <Box sx={{ mb: 3, p: 2, borderRadius: 2, bgcolor: discountUnlocked ? 'success.light' : 'action.hover' }}>
 
-            {/* header row: tag icon + dynamic label that switches between "X more to go" and "unlocked!" */}
+            {/* header row: tag icon + dynamic label that switches between "X more to go" and "unlocked!" -Ahmed */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
               <LocalOfferIcon sx={{ fontSize: 18, color: discountUnlocked ? 'success.dark' : 'text.secondary' }} />
               <Typography variant="body2" fontWeight={600} color={discountUnlocked ? 'success.dark' : 'text.primary'}>
@@ -241,8 +241,8 @@ function Cart() {
               </Typography>
             </Box>
 
-            {/* the actual progress bar — "determinate" means we control the fill with the value prop */}
-            {/* bar color switches from primary (blue) to success (green) once the threshold is hit */}
+            {/* the actual progress bar — "determinate" means we control the fill with the value prop -Ahmed */}
+            {/* bar color switches from primary (blue) to success (green) once the threshold is hit -Ahmed */}
             <LinearProgress
               variant="determinate"
               value={progressPct}
@@ -257,7 +257,7 @@ function Cart() {
               }}
             />
 
-            {/* small labels below the bar showing current subtotal on the left and the $200 goal on the right */}
+            {/* small labels below the bar showing current subtotal on the left and the $200 goal on the right -Ahmed */}
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 0.5 }}>
               <Typography variant="caption" color="text.secondary">${subtotal.toFixed(2)}</Typography>
               <Typography variant="caption" color="text.secondary">$200.00</Typography>
@@ -269,13 +269,13 @@ function Cart() {
               Total
             </Typography>
             <Box sx={{ textAlign: 'right' }}>
-              {/* strikethrough of the original subtotal — only visible after the discount is unlocked */}
+              {/* strikethrough of the original subtotal — only visible after the discount is unlocked -Ahmed */}
               {discountUnlocked && (
                 <Typography variant="body2" color="text.disabled" sx={{ textDecoration: 'line-through' }}>
                   ${subtotal.toFixed(2)}
                 </Typography>
               )}
-              {/* final total — turns green and appends "(50% off)" label when discount is active */}
+              {/* final total — turns green and appends "(50% off)" label when discount is active -Ahmed */}
               <Typography variant="h5" fontWeight={700} color={discountUnlocked ? 'success.dark' : 'text.primary'}>
                 ${total.toFixed(2)}
                 {discountUnlocked && (
