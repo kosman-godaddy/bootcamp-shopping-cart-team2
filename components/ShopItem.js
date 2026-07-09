@@ -1,5 +1,8 @@
 import React from 'react';
-import { Card, CardContent, CardActions, CardMedia, Typography, Button, Chip, Box } from '@mui/material';
+import { Card, CardContent, CardActions, CardMedia, Snackbar, Alert, Typography, Button, Chip, Box, IconButton } from '@mui/material';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import { useFavorites } from '../context/FavoritesContext';
 
 const productImages = {
   1: 'https://images.unsplash.com/photo-1582139329536-e7284fece509?w=400&h=200&fit=crop', // padlock close-up
@@ -13,7 +16,29 @@ function ShopItem({ product, onAddToCart }) {
   const image = product.image_url || productImages[product.id];
   const onSale = product.is_on_sale && product.sale_price != null;
 
+  const [toastOpen, setToastOpen] = React.useState(false);
+  const [toastMessage, setToastMessage] = React.useState('');
+  const { toggleFavorite, isFavorited: checkFavorited } = useFavorites();
+  const isFavorited = checkFavorited(product.id);
+
+  const handleFavoriteClick = () => {
+    toggleFavorite(product);
+  };
+
+  const handleAddToCartClick =  async() => {
+    console.log('Button clicked!');
+    onAddToCart(product);
+    setToastMessage(`${product.name} has been added to your cart.`);
+    setToastOpen(true);
+
+    setTimeout(() => {
+      setToastOpen(false);
+    }, 3000);
+  };
+
+
   return (
+    <>
     <Card sx={{
       width: 220,
       m: '12px',
@@ -26,23 +51,40 @@ function ShopItem({ product, onAddToCart }) {
         transform: 'translateY(-2px)',
       },
     }}>
-      <Box sx={{ position: 'relative' }}>
-        <CardMedia
-          component="img"
-          height="160"
-          image={image}
-          alt={product.name}
-          sx={{ objectFit: 'cover', backgroundColor: '#f5f5f5' }}
-        />
-        {onSale && (
-          <Chip
-            label="Sale"
-            color="error"
-            size="small"
-            sx={{ position: 'absolute', top: 8, right: 8, fontWeight: 700 }}
-          />
-        )}
-      </Box>
+    <Box sx={{ position: 'relative' }}>
+   <CardMedia
+    component="img"
+    height="160"
+    image={image}
+    alt={product.name}
+    sx={{ objectFit: 'cover', backgroundColor: '#f5f5f5' }}
+  />
+  {onSale && (
+    <Chip
+      label="Sale"
+      color="error"
+      size="small"
+      sx={{ position: 'absolute', top: 8, right: 8, fontWeight: 700 }}
+    />
+  )}
+  <IconButton
+    onClick={handleFavoriteClick}
+    size="small"
+    sx={{
+      position: 'absolute',
+      top: 8,
+      left: 8,
+      backgroundColor: 'rgba(255,255,255,0.85)',
+      '&:hover': { backgroundColor: 'rgba(255,255,255,1)' },
+    }}
+  >
+    {isFavorited ? (
+      <FavoriteIcon fontSize="small" sx={{ color: '#e53935' }} />
+    ) : (
+      <FavoriteBorderIcon fontSize="small" sx={{ color: '#666' }} />
+    )}
+  </IconButton>
+  </Box>
 
       <CardContent sx={{ flexGrow: 1, pb: 0 }}>
         <Typography variant="subtitle1" fontWeight={600} noWrap gutterBottom>
@@ -65,7 +107,7 @@ function ShopItem({ product, onAddToCart }) {
 
         {onSale ? (
           <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
-            <Typography variant="h6" fontWeight={700} color="text.primary">
+            <Typography variant="h6" fontWeight={700} color="error.main">
               ${Number(product.sale_price).toFixed(2)}
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ textDecoration: 'line-through' }}>
@@ -81,7 +123,7 @@ function ShopItem({ product, onAddToCart }) {
 
       <CardActions sx={{ px: 2, pb: 2, pt: 1 }}>
         <Button
-          onClick={() => onAddToCart(product)}
+          onClick={handleAddToCartClick}
           variant="contained"
           fullWidth
           size="small"
@@ -91,7 +133,21 @@ function ShopItem({ product, onAddToCart }) {
         </Button>
       </CardActions>
     </Card>
-  );
+
+    
+    <Snackbar
+      open={toastOpen}
+      autoHideDuration={3000}
+      onClose={() => setToastOpen(false)}
+      anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+    >
+      <Alert onClose={() => setToastOpen(false)} severity="success" sx={{ width: '100%' }}>
+        {toastMessage}
+      </Alert>
+    </Snackbar>
+  </>
+);
 }
+
 
 export default ShopItem;

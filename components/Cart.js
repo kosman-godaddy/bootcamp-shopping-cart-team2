@@ -13,6 +13,11 @@ import {
   MenuItem,
   Select,
   Paper,
+  TextField,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+  FormLabel,
 } from '@mui/material';
 import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
 import CartItem from './CartItem';
@@ -42,8 +47,9 @@ function Cart() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [snackOpen, setSnackOpen] = useState(false);
-  const [selectedPromo, setSelectedPromo] = useState('');
-  const [checkoutTotal, setCheckoutTotal] = useState(null);
+ 
+  const [selectedPromo, setSelectedPromo] = useState(''); // stores current promo code
+  const [checkoutTotal, setCheckoutTotal] = useState(null); // // stores final checkout total so success message shows when cart items cleared 
 
   const fetchItems = async () => {
     const response = await fetch('http://localhost:8000/v1/cartitems');
@@ -85,12 +91,13 @@ function Cart() {
   setCheckoutTotal(finalTotal);
   setSnackOpen(true);
 };
-
+// calculates cart subtotal before discount 
   const subtotal = items.reduce(
   (sum, item) => sum + Number(item.price) * item.quantity,
   0
 );
 
+// finds the active promo code object based on the selected promo code
 const activePromo = promoCodes.find((promo) => promo.code === selectedPromo);
 
 const discount = activePromo
@@ -98,7 +105,7 @@ const discount = activePromo
     ? subtotal * activePromo.value
     : Math.min(activePromo.value, subtotal)
   : 0;
-
+// calculates total after discount, ensuring it doesn't go below zero
 const total = Math.max(subtotal - discount, 0);
 
   if (loading) return null;
@@ -171,7 +178,7 @@ const total = Math.max(subtotal - discount, 0);
             ))}
           </Select>
         </FormControl>
-
+        // 
         {activePromo && (
           <Typography variant="body2" color="success.main" sx={{ mt: 1.5 }}>
             {activePromo.code} applied — You saved ${discount.toFixed(2)}
@@ -191,14 +198,46 @@ const total = Math.max(subtotal - discount, 0);
             ))}
           </Stack>
           <Divider sx={{ my: 3 }} />
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 3 }}>
-            <Typography variant="h6" color="text.secondary">
-              Total
-            </Typography>
-            <Typography variant="h5" fontWeight={700} color="text.primary">
-              ${total.toFixed(2)}
-            </Typography>
-          </Box>
+          <Box
+  sx={{
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-end',
+    gap: 1,
+  }}
+>
+  <Box sx={{ display: 'flex', gap: 3 }}>
+    <Typography variant="body1" color="text.secondary">
+      Subtotal
+    </Typography>
+
+    <Typography variant="body1" color="text.primary">
+      ${subtotal.toFixed(2)}
+    </Typography>
+  </Box>
+
+  {activePromo && (
+    <Box sx={{ display: 'flex', gap: 3 }}>
+      <Typography variant="body1" color="success.main">
+        Discount ({activePromo.code})
+      </Typography>
+
+      <Typography variant="body1" color="success.main">
+        -${discount.toFixed(2)}
+      </Typography>
+    </Box>
+  )}
+
+  <Box sx={{ display: 'flex', gap: 3 }}>
+    <Typography variant="h6" color="text.secondary">
+      Total
+    </Typography>
+
+    <Typography variant="h5" fontWeight={700} color="text.primary">
+      ${total.toFixed(2)}
+    </Typography>
+  </Box>
+</Box>
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
             <Button
               variant="contained"
