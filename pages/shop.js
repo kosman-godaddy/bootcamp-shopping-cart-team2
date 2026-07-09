@@ -1,15 +1,14 @@
 import React from 'react';
-import Head from '../components/head';
+import Head from 'next/head';
 import Link from 'next/link';
-import ShoppingItemList from '../components/ShopItemList';
+import ShopItemList from '../components/ShopItemList';
 import { Container, Typography, Button, Box, Divider } from '@mui/material';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
-import ShopItem from '../components/ShopItem';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import DarkModeToggle from '../components/DarkModeToggle';
 
-export const ShopPage = () => ( // main shop page, displays hearts for favorited items -Nyla
-  <Box sx={{ bgcolor: 'background.default', minHeight: '100vh' }}>
+function ShopPage  () { // main shop page, displays hearts for favorited items -Nyla
+  return <Box sx={{ bgcolor: 'background.default', minHeight: '100vh' }}>
     <Box sx={{ bgcolor: 'background.paper', borderBottom: '1px solid', borderColor: 'divider', py: 2 }}>
       <Container maxWidth="lg" sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography variant="h5" fontWeight={700} color="text.primary">
@@ -34,9 +33,9 @@ export const ShopPage = () => ( // main shop page, displays hearts for favorited
     </Box>
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Head title="Shop" />
-      <ShoppingItemList />
+      <ShopItemList />
     </Container>
   </Box>
-);
+};
 
 export default ShopPage;

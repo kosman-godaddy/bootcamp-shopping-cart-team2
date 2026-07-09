@@ -13,17 +13,24 @@ const productImages = {
 };
 
 function ShopItem({ product, onAddToCart }) {
-  const image = product.image_url || productImages[product.id];
-  const onSale = product.is_on_sale && product.sale_price != null;
-
-  const [toastOpen, setToastOpen] = React.useState(false); // Notification for adding to cart - Ian
-  const [toastMessage, setToastMessage] = React.useState(''); // Notification for adding to cart - Ian
+  // Track whether the "added to cart" toast notification is visible and what message it shows
   const [toastOpen, setToastOpen] = React.useState(false);
   const [toastMessage, setToastMessage] = React.useState('');
-  const { toggleFavorite, isFavorited: checkFavorited } = useFavorites();
-  const isFavorited = checkFavorited(product.id);
 
-  const handleFavoriteClick = () => {
+  const { toggleFavorite, isFavorited: checkFavorited } = useFavorites(); //Check if product is favorited - Nyla
+
+  // If no product data was passed in, render nothing to avoid crashes
+  if (!product) return null;
+
+  // Use the product's own image URL if it has one, or use productImages above
+  const image = product.image_url || productImages[Number(product.id)];
+
+  const onSale = product.is_on_sale && product.sale_price != null;   // onSale is only true when both the sale flag is set AND a sale price actually exists
+  
+  const isFavorited = checkFavorited(product.id); // Check if this specific product is in the user's favorites list - Nyla
+
+  
+  const handleFavoriteClick = () => { // Add/Remove product froom favrites when heart is clicked - Nyla
     toggleFavorite(product);
   };
 
@@ -150,6 +157,5 @@ function ShopItem({ product, onAddToCart }) {
   </>
 );
 }
-
 
 export default ShopItem;
