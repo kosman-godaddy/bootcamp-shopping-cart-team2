@@ -15,9 +15,9 @@ const DISCOUNT_THRESHOLD = 200; // the cart subtotal (in $) the user must reach 
 const DISCOUNT_RATE = 0.5;      // the fraction taken off the subtotal once the threshold is met -Ahmed
 
 const PROMO_CODES = [
-  { code: 'WELCOME10', label: '10% off', type: 'percent', value: 0.10 },
-  { code: 'SAVE20',    label: '20% off', type: 'percent', value: 0.20 },
-  { code: 'FLAT5',     label: '$5 off',  type: 'fixed',   value: 5 },
+  { code: 'BootCamp26', label: '10% off', type: 'percent', value: 0.10 },
+  { code: 'SAVE26',    label: '26% off', type: 'percent', value: 0.26 },
+  { code: 'AEIKN',     label: '$5 off',  type: 'fixed',   value: 5},
 ];
 
 function Cart() {
