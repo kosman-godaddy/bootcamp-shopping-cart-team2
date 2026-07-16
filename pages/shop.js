@@ -1,19 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import ShopItemList from '../components/ShopItemList';
-import { Container, Typography, Button, Box, Divider } from '@mui/material';
+import { Container, Typography, Button, Box, TextField, InputAdornment } from '@mui/material';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import SearchIcon from '@mui/icons-material/Search';
 import DarkModeToggle from '../components/DarkModeToggle';
 
-function ShopPage  () { // main shop page, displays hearts for favorited items -Nyla
+function ShopPage() { // main shop page, displays hearts for favorited items -Nyla
+  const [searchQuery, setSearchQuery] = useState('');
+
   return <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
     <Box sx={{ bgcolor: 'background.paper', borderBottom: '1px solid', borderColor: 'divider', py: 2 }}>
       <Container maxWidth="lg" sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography variant="h5" fontWeight={700} color="text.primary">
           DOUGHMAINS
-        </Typography> 
+        </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Link href="/favorites" passHref>
             <Button variant="outlined" startIcon={<FavoriteBorderIcon />} size="small">
@@ -28,10 +31,26 @@ function ShopPage  () { // main shop page, displays hearts for favorited items -
           <DarkModeToggle />
         </Box>
       </Container>
+      <Container maxWidth="lg" sx={{ mt: 2, display: 'flex', gap: 1 }}>
+        <TextField
+          size="small"
+          sx={{ flex: 1, maxWidth: '95.3%', bgcolor: 'background.default', borderRadius: 1 }}
+          placeholder="Search products..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon fontSize="small" />
+              </InputAdornment>
+            ),
+          }}
+        />
+      </Container>
     </Box>
     <Container maxWidth="lg" sx={{ py: 4, flex: 1, display: 'flex', alignItems: 'center' }}>
       <Head title="Shop" />
-      <ShopItemList />
+      <ShopItemList searchQuery={searchQuery} />
     </Container>
   </Box>
 };
