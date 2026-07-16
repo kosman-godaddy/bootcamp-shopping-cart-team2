@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Grid } from '@mui/material'
 import ShopItem from './ShopItem';
 
-function ShoppingItemList({ searchQuery = '' }) {
+function ShoppingItemList({ searchQuery = '' }) { // searchQuery comes from the search bar on the shop page - Ahmed
 
   const [products, setProducts] = useState([]);
   useEffect(() => {
@@ -45,6 +45,7 @@ function ShoppingItemList({ searchQuery = '' }) {
 
 };
 
+  // only show products whose name contains the search text - Ahmed
   const filteredProducts = products.filter((p) =>
     p.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
