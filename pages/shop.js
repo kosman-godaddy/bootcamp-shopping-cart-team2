@@ -14,8 +14,8 @@ function ShopPage() { // main shop page, displays hearts for favorited items -Ny
   return <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
     <Box sx={{ bgcolor: 'background.paper', borderBottom: '1px solid', borderColor: 'divider', py: 2 }}>
       <Container maxWidth="lg" sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h5" fontWeight={700} color="text.primary">
-          DOUGHMAINS
+        <Typography variant="h5" color="text.primary" sx={{ display: 'flex', alignItems: 'center', fontSize: '2rem', fontFamily: "'Fredoka One', cursive" }}>
+          D<span style={{ fontSize: '1.4em', lineHeight: 1 }}>🍩</span>mains
         </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Link href="/favorites" passHref>

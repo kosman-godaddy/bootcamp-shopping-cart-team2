@@ -1,4 +1,5 @@
 import React, { createContext, useState, useMemo } from 'react';
+import Head from 'next/head';
 import PropTypes from 'prop-types';
 const { nextRedux } = require('../redux/store');
 import { AppCacheProvider } from '@mui/material-nextjs/v13-pagesRouter';
@@ -24,7 +25,12 @@ function WrappedApp({ Component, pageProps }) {
   const theme = useMemo(() => createTheme({ palette: { mode } }), [mode]);
 
   return ( // calls useFavorites so the hearts on shop/favorite page match up -Nyla
-    <FavoritesProvider> 
+    <FavoritesProvider>
+      <Head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet" />
+      </Head> 
       <ColorModeContext.Provider value={colorMode}>
         <ThemeProvider theme={theme}>
           <CssBaseline />
