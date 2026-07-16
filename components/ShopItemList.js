@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Grid } from '@mui/material'
 import ShopItem from './ShopItem';
 
-function ShoppingItemList() {
+function ShoppingItemList({ searchQuery = '' }) {
 
-  
   const [products, setProducts] = useState([]);
   useEffect(() => {
     const fetchProducts = async () => {
@@ -46,9 +45,13 @@ function ShoppingItemList() {
 
 };
 
+  const filteredProducts = products.filter((p) =>
+    p.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <Grid container direction="row" spacing={1}>
-      {products.map((product) => (
+      {filteredProducts.map((product) => (
         <ShopItem key={product.id} product={product} onAddToCart={handleAddToCart} />
       ))}
     </Grid>
