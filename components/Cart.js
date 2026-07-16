@@ -14,6 +14,12 @@ import CartItem from './CartItem';
 const DISCOUNT_THRESHOLD = 200; // the cart subtotal (in $) the user must reach to unlock 50% off -Ahmed
 const DISCOUNT_RATE = 0.5;      // the fraction taken off the subtotal once the threshold is met -Ahmed
 
+const PROMO_CODES = [
+  { code: 'WELCOME10', label: '10% off', type: 'percent', value: 0.10 },
+  { code: 'SAVE20',    label: '20% off', type: 'percent', value: 0.20 },
+  { code: 'FLAT5',     label: '$5 off',  type: 'fixed',   value: 5 },
+];
+
 function Cart() {
   const [items, setItems] = useState([]);
   const [products, setProducts] = useState([]);
@@ -21,6 +27,7 @@ function Cart() {
   const [snackOpen, setSnackOpen] = useState(false);
   const [checkingOut, setCheckingOut] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', phone: '', payment: 'card' });  // Personal information form state
+  const [selectedPromo, setSelectedPromo] = useState(null);
 
   const fetchItems = async () => {
     const [cartRes, productRes] = await Promise.all([
@@ -89,6 +96,12 @@ function Cart() {
   const total = discountUnlocked ? subtotal * (1 - DISCOUNT_RATE) : subtotal; // final price shown to the user: half the subtotal if discount is active, otherwise unchanged -Ahmed
   const progressPct = Math.min((subtotal / DISCOUNT_THRESHOLD) * 100, 100); // 0–100 value that drives the LinearProgress bar fill; capped at 100 so it never overflows -Ahmed
   const amountToGo = Math.max(DISCOUNT_THRESHOLD - subtotal, 0); // how many more dollars the user needs to spend; floors at 0 so it never goes negative -Ahmed
+  const promoDiscount = selectedPromo
+    ? selectedPromo.type === 'percent'
+      ? total * selectedPromo.value
+      : Math.min(selectedPromo.value, total)
+    : 0;
+  const finalTotal = total - promoDiscount;
 
   if (loading) return null;
 
@@ -122,14 +135,12 @@ function Cart() {
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
             Order total:{' '}
-            {/* strikethrough original price shown on the checkout form only when discount is active -Ahmed */}
-            {discountUnlocked && (
+            {(discountUnlocked || selectedPromo) && (
               <span style={{ textDecoration: 'line-through', marginRight: 6 }}>${subtotal.toFixed(2)}</span>
             )}
-            {/* discounted (or regular) total carried through from the cart page -Ahmed */}
-            <strong>${total.toFixed(2)}</strong>
-            {/* confirmation label so the user knows the 50% was actually applied at checkout -Ahmed */}
+            <strong>${finalTotal.toFixed(2)}</strong>
             {discountUnlocked && <span style={{ color: 'green', marginLeft: 6 }}>(50% off applied)</span>}
+            {selectedPromo && <span style={{ color: 'green', marginLeft: 6 }}>({selectedPromo.code} applied)</span>}
           </Typography>
 
           <Stack spacing={3}>
@@ -198,7 +209,7 @@ function Cart() {
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
         <Alert severity="success" onClose={() => setSnackOpen(false)} sx={{ width: '100%' }}>
-          Order placed for ${total.toFixed(2)} — Thank you, have a good day!
+          Order placed for ${finalTotal.toFixed(2)} — Thank you, have a good day!
         </Alert>
       </Snackbar>
 
@@ -264,20 +275,62 @@ function Cart() {
             </Box>
           </Box>
 
+          {/* Promo code picker + price breakdown */}
+          <Box sx={{ mb: 3, p: 2, borderRadius: 2, border: '1px solid #e0e0e0' }}>
+            <Typography variant="body2" fontWeight={600} sx={{ mb: 1.5 }}>
+              Promo Codes
+            </Typography>
+            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+              {PROMO_CODES.map((promo) => (
+                <Button
+                  key={promo.code}
+                  variant={selectedPromo?.code === promo.code ? 'contained' : 'outlined'}
+                  size="small"
+                  disableElevation
+                  onClick={() => setSelectedPromo(selectedPromo?.code === promo.code ? null : promo)}
+                >
+                  {promo.code} — {promo.label}
+                </Button>
+              ))}
+            </Stack>
+
+            <Box sx={{ mt: 2 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                <Typography variant="body2" color="text.secondary">Subtotal</Typography>
+                <Typography variant="body2">${subtotal.toFixed(2)}</Typography>
+              </Box>
+              {discountUnlocked && (
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                  <Typography variant="body2" color="success.dark">50% off (unlocked)</Typography>
+                  <Typography variant="body2" color="success.dark">-${(subtotal - total).toFixed(2)}</Typography>
+                </Box>
+              )}
+              {selectedPromo && (
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                  <Typography variant="body2" color="success.dark">{selectedPromo.code} ({selectedPromo.label})</Typography>
+                  <Typography variant="body2" color="success.dark">-${promoDiscount.toFixed(2)}</Typography>
+                </Box>
+              )}
+              <Divider sx={{ my: 1 }} />
+              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Typography variant="body1" fontWeight={700}>Total</Typography>
+                <Typography variant="body1" fontWeight={700}>${finalTotal.toFixed(2)}</Typography>
+              </Box>
+            </Box>
+          </Box>
+
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 3 }}>
             <Typography variant="h6" color="text.secondary">
               Total
             </Typography>
             <Box sx={{ textAlign: 'right' }}>
-              {/* strikethrough of the original subtotal — only visible after the discount is unlocked -Ahmed */}
               {discountUnlocked && (
                 <Typography variant="body2" color="text.disabled" sx={{ textDecoration: 'line-through' }}>
                   ${subtotal.toFixed(2)}
                 </Typography>
               )}
-              {/* final total — turns green and appends "(50% off)" label when discount is active -Ahmed */}
-              <Typography variant="h5" fontWeight={700} color={discountUnlocked ? 'success.dark' : 'text.primary'}>
-                ${total.toFixed(2)}
+              <Typography variant="h5" fontWeight={700} color={discountUnlocked || selectedPromo ? 'success.dark' : 'text.primary'}>
+                ${finalTotal.toFixed(2)}
                 {discountUnlocked && (
                   <Typography component="span" variant="body2" fontWeight={600} color="success.dark" sx={{ ml: 1 }}>
                     (50% off)
