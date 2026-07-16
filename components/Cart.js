@@ -82,6 +82,17 @@ function Cart() {
   };
 
   const handlePlaceOrder = async () => {
+    await fetch('http://localhost:8000/v1/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: form.name,
+        email: form.email,
+        phone: form.phone,
+        payment: form.payment,
+        total: finalTotal,
+      }),
+    });
     await Promise.all(items.map((item) =>
       fetch(`http://localhost:8000/v1/cartitems/${item.id}`, { method: 'DELETE' })
     ));
