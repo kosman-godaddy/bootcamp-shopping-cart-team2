@@ -8,11 +8,11 @@ import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import DarkModeToggle from '../components/DarkModeToggle';
 
 function ShopPage  () { // main shop page, displays hearts for favorited items -Nyla
-  return <Box sx={{ bgcolor: 'background.default', minHeight: '100vh' }}>
+  return <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
     <Box sx={{ bgcolor: 'background.paper', borderBottom: '1px solid', borderColor: 'divider', py: 2 }}>
       <Container maxWidth="lg" sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography variant="h5" fontWeight={700} color="text.primary">
-          My Shop
+          DOUGHMAINS
         </Typography> 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Link href="/favorites" passHref>
@@ -29,7 +29,7 @@ function ShopPage  () { // main shop page, displays hearts for favorited items -
         </Box>
       </Container>
     </Box>
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Container maxWidth="lg" sx={{ py: 4, flex: 1, display: 'flex', alignItems: 'center' }}>
       <Head title="Shop" />
       <ShopItemList />
     </Container>
