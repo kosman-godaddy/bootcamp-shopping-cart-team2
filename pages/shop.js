@@ -5,6 +5,7 @@ import ShopItemList from '../components/ShopItemList';
 import { Container, Typography, Button, Box, TextField, InputAdornment } from '@mui/material';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import SearchIcon from '@mui/icons-material/Search';
 import DarkModeToggle from '../components/DarkModeToggle';
 
@@ -21,6 +22,11 @@ function ShopPage() { // main shop page, displays hearts for favorited items -Ny
           <Link href="/favorites" passHref>
             <Button variant="outlined" startIcon={<FavoriteBorderIcon />} size="small">
               Favorites
+            </Button>
+          </Link>
+          <Link href="/order-history" passHref>
+            <Button variant="outlined" startIcon={<ReceiptLongIcon />} size="small">
+              Order History
             </Button>
           </Link>
           <Link href="/cart" passHref>

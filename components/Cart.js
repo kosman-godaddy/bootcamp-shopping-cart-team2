@@ -91,6 +91,7 @@ function Cart() {
         phone: form.phone,
         payment: form.payment,
         total: finalTotal,
+        items: items.map((item) => ({ name: item.name, price: item.price, quantity: item.quantity })),
       }),
     });
     await Promise.all(items.map((item) =>
