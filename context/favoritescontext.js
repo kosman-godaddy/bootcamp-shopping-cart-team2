@@ -1,10 +1,24 @@
 //functionality for favoriting items on the shop page (adding, removing, checks to see if it is already added) -Nyla
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 
 const FavoritesContext = createContext();
 
 export function FavoritesProvider({ children }) {
   const [favorites, setFavorites] = useState([]);
+  const loaded = useRef(false);
+
+  useEffect(() => {
+    if (!loaded.current) return;
+    localStorage.setItem('favorites', JSON.stringify(favorites));
+  }, [favorites]);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('favorites');
+      if (saved) setFavorites(JSON.parse(saved));
+    } catch {}
+    loaded.current = true;
+  }, []);
 
   const toggleFavorite = (product) => {
     setFavorites((prev) => {
