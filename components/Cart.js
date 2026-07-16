@@ -28,6 +28,19 @@ function Cart() {
   const [checkingOut, setCheckingOut] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', phone: '', payment: 'card' });  // Personal information form state
   const [selectedPromo, setSelectedPromo] = useState(null);
+  const [promoInput, setPromoInput] = useState('');
+  const [promoError, setPromoError] = useState('');
+
+  const handleApplyPromo = () => {
+    const match = PROMO_CODES.find((p) => p.code === promoInput.trim());
+    if (match) {
+      setSelectedPromo(match);
+      setPromoError('');
+    } else {
+      setSelectedPromo(null);
+      setPromoError('Invalid promo code.');
+    }
+  };
 
   const fetchItems = async () => {
     const [cartRes, productRes] = await Promise.all([
@@ -286,23 +299,31 @@ function Cart() {
             </Box>
           </Box>
 
-          {/* Promo code picker + price breakdown */}
+          {/* Promo code input + price breakdown */}
           <Box sx={{ mb: 3, p: 2, borderRadius: 2, border: '1px solid #e0e0e0' }}>
             <Typography variant="body2" fontWeight={600} sx={{ mb: 1.5 }}>
-              Promo Codes
+              Promo Code
             </Typography>
-            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-              {PROMO_CODES.map((promo) => (
-                <Button
-                  key={promo.code}
-                  variant={selectedPromo?.code === promo.code ? 'contained' : 'outlined'}
-                  size="small"
-                  disableElevation
-                  onClick={() => setSelectedPromo(selectedPromo?.code === promo.code ? null : promo)}
-                >
-                  {promo.code} — {promo.label}
+            <Stack direction="row" spacing={1}>
+              <TextField
+                size="small"
+                placeholder="Enter promo code"
+                value={promoInput}
+                onChange={(e) => { setPromoInput(e.target.value); setPromoError(''); }}
+                onKeyDown={(e) => e.key === 'Enter' && handleApplyPromo()}
+                error={!!promoError}
+                helperText={promoError || (selectedPromo ? `${selectedPromo.code} applied!` : '')}
+                FormHelperTextProps={{ sx: { color: selectedPromo && !promoError ? 'success.main' : undefined } }}
+                sx={{ flex: 1 }}
+              />
+              <Button variant="outlined" size="small" disableElevation onClick={handleApplyPromo}>
+                Apply
+              </Button>
+              {selectedPromo && (
+                <Button variant="text" size="small" onClick={() => { setSelectedPromo(null); setPromoInput(''); }}>
+                  Remove
                 </Button>
-              ))}
+              )}
             </Stack>
 
             <Box sx={{ mt: 2 }}>
