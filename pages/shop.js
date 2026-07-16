@@ -14,20 +14,18 @@ function ShopPage  () { // main shop page, displays hearts for favorited items -
         <Typography variant="h5" fontWeight={700} color="text.primary">
           My Shop
         </Typography> 
-        <Box sx={{ display: 'flex', gap: 1 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Link href="/favorites" passHref>
             <Button variant="outlined" startIcon={<FavoriteBorderIcon />} size="small">
               Favorites
             </Button>
           </Link>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <DarkModeToggle />
           <Link href="/cart" passHref>
             <Button variant="outlined" startIcon={<ShoppingCartOutlinedIcon />} size="small">
               View Cart
             </Button>
           </Link>
-        </Box>
+          <DarkModeToggle />
         </Box>
       </Container>
     </Box>
