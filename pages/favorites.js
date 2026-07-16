@@ -1,3 +1,4 @@
+//actual favorites page, displays all items that have been hearted. Allows you to go back to shop and remove items -Nyla
 import React from 'react';
 import Head from '../components/head';
 import Link from 'next/link';

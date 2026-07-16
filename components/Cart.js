@@ -1,64 +1,48 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import confetti from 'canvas-confetti';
 import {
-  Typography,
-  Button,
-  Box,
-  Divider,
-  Stack,
-  Snackbar,
-  Alert,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  Paper,
-  TextField,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
-  FormLabel,
+  Typography, Button, Box, Divider, Stack, Snackbar, Alert,
+  TextField, RadioGroup, FormControlLabel, Radio, FormLabel, FormControl, Paper,
+  LinearProgress,
 } from '@mui/material';
+import LocalOfferIcon from '@mui/icons-material/LocalOffer'; // tag icon shown inside the progress bar banner -Ahmed
 import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CartItem from './CartItem';
 
-const promoCodes = [
-  {
-    code: 'SAVE10',
-    label: 'SAVE10 — 10% off',
-    type: 'percent',
-    value: 0.1,
-  },
-  {
-    code: 'WELCOME5',
-    label: 'WELCOME5 — $5 off',
-    type: 'fixed',
-    value: 5,
-  },
-  {
-    code: 'DEAL15',
-    label: 'DEAL15 — 15% off',
-    type: 'percent',
-    value: 0.15,
-  },
-];
+const DISCOUNT_THRESHOLD = 200; // the cart subtotal (in $) the user must reach to unlock 50% off -Ahmed
+const DISCOUNT_RATE = 0.5;      // the fraction taken off the subtotal once the threshold is met -Ahmed
 
 function Cart() {
   const [items, setItems] = useState([]);
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [snackOpen, setSnackOpen] = useState(false);
- 
-  const [selectedPromo, setSelectedPromo] = useState(''); // stores current promo code
-  const [checkoutTotal, setCheckoutTotal] = useState(null); // // stores final checkout total so success message shows when cart items cleared 
+  const [checkingOut, setCheckingOut] = useState(false);
+  const [form, setForm] = useState({ name: '', email: '', phone: '', payment: 'card' });  // Personal information form state
 
   const fetchItems = async () => {
-    const response = await fetch('http://localhost:8000/v1/cartitems');
-    const data = await response.json();
-    setItems(Array.isArray(data) ? data : data.cartItems ?? []);
+    const [cartRes, productRes] = await Promise.all([
+      fetch('http://localhost:8000/v1/cartitems'),
+      fetch('http://localhost:8000/v1/products'),
+    ]);
+    const cartData = await cartRes.json();
+    const productData = await productRes.json();
+    setItems(Array.isArray(cartData) ? cartData : cartData.cartItems ?? []);
+    setProducts(Array.isArray(productData) ? productData : productData.products ?? []);
     setLoading(false);
   };
 
   useEffect(() => { fetchItems(); }, []);
+
+  const getOriginalPrice = (item) => {
+    const product = products.find((p) => p.name === item.name);
+    if (product && product.is_on_sale && product.sale_price != null) {
+      return product.price;
+    }
+    return null;
+  };
 
   const handleRemove = async (id) => {
     await fetch(`http://localhost:8000/v1/cartitems/${id}`, { method: 'DELETE' });
@@ -75,40 +59,135 @@ function Cart() {
     fetchItems();
   };
 
-  const handleCheckout = async () => {
-  const finalTotal = total;
+  const handleCheckout = () => {
+    setCheckingOut(true);
+  };
 
-  await Promise.all(
-    items.map((item) =>
-      fetch(`http://localhost:8000/v1/cartitems/${item.id}`, {
-        method: 'DELETE',
-      })
-    )
-  );
+  const fireConfetti = () => { // Function to fire confetti animation - Ian
+    const duration = 3000;
+    const end = Date.now() + duration;
+    const frame = () => {
+      confetti({ particleCount: 6, angle: 60, spread: 55, origin: { x: 0 } });
+      confetti({ particleCount: 6, angle: 120, spread: 55, origin: { x: 1 } });
+      if (Date.now() < end) requestAnimationFrame(frame);
+    };
+    frame();
+  };
 
-  setItems([]);
-  setSelectedPromo('');
-  setCheckoutTotal(finalTotal);
-  setSnackOpen(true);
-};
-// calculates cart subtotal before discount 
-  const subtotal = items.reduce(
-  (sum, item) => sum + Number(item.price) * item.quantity,
-  0
-);
+  const handlePlaceOrder = async () => {
+    await Promise.all(items.map((item) =>
+      fetch(`http://localhost:8000/v1/cartitems/${item.id}`, { method: 'DELETE' })
+    ));
+    setItems([]);
+    setCheckingOut(false);
+    setSnackOpen(true); //Stay on shop page and show snackbar notification after order is placed - Ian
+    fireConfetti(); //confetti animation after order is placed - Ian
+  };
 
-// finds the active promo code object based on the selected promo code
-const activePromo = promoCodes.find((promo) => promo.code === selectedPromo);
-
-const discount = activePromo
-  ? activePromo.type === 'percent'
-    ? subtotal * activePromo.value
-    : Math.min(activePromo.value, subtotal)
-  : 0;
-// calculates total after discount, ensuring it doesn't go below zero
-const total = Math.max(subtotal - discount, 0);
+  const subtotal = items.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0); // sum of all item prices × their quantities before any discount -Ahmed
+  const discountUnlocked = subtotal >= DISCOUNT_THRESHOLD; // true once the cart hits $200 — flips the bar green and halves the total -Ahmed
+  const total = discountUnlocked ? subtotal * (1 - DISCOUNT_RATE) : subtotal; // final price shown to the user: half the subtotal if discount is active, otherwise unchanged -Ahmed
+  const progressPct = Math.min((subtotal / DISCOUNT_THRESHOLD) * 100, 100); // 0–100 value that drives the LinearProgress bar fill; capped at 100 so it never overflows -Ahmed
+  const amountToGo = Math.max(DISCOUNT_THRESHOLD - subtotal, 0); // how many more dollars the user needs to spend; floors at 0 so it never goes negative -Ahmed
 
   if (loading) return null;
+
+  if (checkingOut) {
+    return (
+      <Box>
+        <Snackbar
+          open={snackOpen}
+          autoHideDuration={4000}
+          onClose={() => setSnackOpen(false)}
+          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        >
+          <Alert severity="success" onClose={() => setSnackOpen(false)} sx={{ width: '100%' }}>
+            Order placed — Thank you, have a good day!
+          </Alert>
+        </Snackbar>
+
+        <Paper elevation={0} sx={{ p: 4, borderRadius: 3, border: '1px solid #e0e0e0' }}>
+          <Button
+            variant="text"
+            startIcon={<ArrowBackIcon />}
+            size="small"
+            onClick={() => setCheckingOut(false)}
+            sx={{ mb: 3, pl: 0 }}
+          >
+            Back to Cart
+          </Button>
+
+          <Typography variant="h5" fontWeight={700} gutterBottom>
+            Place Order
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
+            Order total:{' '}
+            {/* strikethrough original price shown on the checkout form only when discount is active -Ahmed */}
+            {discountUnlocked && (
+              <span style={{ textDecoration: 'line-through', marginRight: 6 }}>${subtotal.toFixed(2)}</span>
+            )}
+            {/* discounted (or regular) total carried through from the cart page -Ahmed */}
+            <strong>${total.toFixed(2)}</strong>
+            {/* confirmation label so the user knows the 50% was actually applied at checkout -Ahmed */}
+            {discountUnlocked && <span style={{ color: 'green', marginLeft: 6 }}>(50% off applied)</span>}
+          </Typography>
+
+          <Stack spacing={3}>
+            <TextField
+              label="Full Name"
+              variant="outlined"
+              fullWidth
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+            />
+            <TextField
+              label="Email Address"
+              variant="outlined"
+              fullWidth
+              type="email"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+            />
+            <TextField
+              label="Phone Number"
+              variant="outlined"
+              fullWidth
+              type="tel"
+              value={form.phone}
+              onChange={(e) => setForm({ ...form, phone: e.target.value })}
+            />
+
+            <FormControl>
+              <FormLabel sx={{ mb: 1, fontWeight: 600, color: 'text.primary' }}>
+                Payment Method
+              </FormLabel>
+              <RadioGroup
+                value={form.payment}
+                onChange={(e) => setForm({ ...form, payment: e.target.value })}
+              >
+                <FormControlLabel value="card" control={<Radio />} label="Credit / Debit Card" />
+                <FormControlLabel value="paypal" control={<Radio />} label="PayPal" />
+              </RadioGroup>
+            </FormControl>
+          </Stack>
+
+          <Divider sx={{ my: 4 }} />
+
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Button
+              variant="contained"
+              size="large"
+              disableElevation
+              onClick={handlePlaceOrder}
+              sx={{ px: 6 }}
+            >
+              Place Order
+            </Button>
+          </Box>
+        </Paper>
+      </Box>
+    );
+  }
 
   return (
     <Box>
@@ -119,7 +198,7 @@ const total = Math.max(subtotal - discount, 0);
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
         <Alert severity="success" onClose={() => setSnackOpen(false)} sx={{ width: '100%' }}>
-          Order placed for ${(checkoutTotal ?? total).toFixed(2)} — Thank you, have a good day!
+          Order placed for ${total.toFixed(2)} — Thank you, have a good day!
         </Alert>
       </Snackbar>
 
@@ -137,107 +216,76 @@ const total = Math.max(subtotal - discount, 0);
         </Box>
       ) : (
         <>
-          <Box
-      sx={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
-        gap: 2,
-        mb: 3,
-      }}
-    >
-      <Typography variant="h6" fontWeight={700}>
-        Cart Items
-      </Typography>
-
-      <Paper
-        elevation={0}
-        sx={{
-          p: 2,
-          minWidth: 280,
-          border: '1px solid #e0e0e0',
-          borderRadius: 2,
-          backgroundColor: '#fff',
-        }}
-      >
-        <FormControl fullWidth size="small">
-          <InputLabel id="promo-code-label">Promo Code</InputLabel>
-
-          <Select
-            labelId="promo-code-label"
-            value={selectedPromo}
-            label="Promo Code"
-            onChange={(event) => setSelectedPromo(event.target.value)}
-          >
-            <MenuItem value="">No promo code</MenuItem>
-
-            {promoCodes.map((promo) => (
-              <MenuItem key={promo.code} value={promo.code}>
-                {promo.label}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        // 
-        {activePromo && (
-          <Typography variant="body2" color="success.main" sx={{ mt: 1.5 }}>
-            {activePromo.code} applied — You saved ${discount.toFixed(2)}
-          </Typography>
-        )}
-      </Paper>
-    </Box>
-
           <Stack spacing={2}>
             {items.map((item) => (
               <CartItem
                 key={item.id}
-                item={item}
+                item={{ ...item, original_price: getOriginalPrice(item) }}
                 onRemove={handleRemove}
                 onUpdateQuantity={handleUpdateQuantity}
               />
             ))}
           </Stack>
           <Divider sx={{ my: 3 }} />
-          <Box
-  sx={{
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'flex-end',
-    gap: 1,
-  }}
->
-  <Box sx={{ display: 'flex', gap: 3 }}>
-    <Typography variant="body1" color="text.secondary">
-      Subtotal
-    </Typography>
 
-    <Typography variant="body1" color="text.primary">
-      ${subtotal.toFixed(2)}
-    </Typography>
-  </Box>
+          {/* 50% off progress bar — whole banner turns green when the discount is unlocked -Ahmed */}
+          <Box sx={{ mb: 3, p: 2, borderRadius: 2, bgcolor: discountUnlocked ? 'success.light' : 'action.hover' }}>
 
-  {activePromo && (
-    <Box sx={{ display: 'flex', gap: 3 }}>
-      <Typography variant="body1" color="success.main">
-        Discount ({activePromo.code})
-      </Typography>
+            {/* header row: tag icon + dynamic label that switches between "X more to go" and "unlocked!" -Ahmed */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+              <LocalOfferIcon sx={{ fontSize: 18, color: discountUnlocked ? 'success.dark' : 'text.secondary' }} />
+              <Typography variant="body2" fontWeight={600} color={discountUnlocked ? 'success.dark' : 'text.primary'}>
+                {discountUnlocked
+                  ? '50% off unlocked!'
+                  : `Spend $${amountToGo.toFixed(2)} more to get 50% off your order`}
+              </Typography>
+            </Box>
 
-      <Typography variant="body1" color="success.main">
-        -${discount.toFixed(2)}
-      </Typography>
-    </Box>
-  )}
+            {/* the actual progress bar — "determinate" means we control the fill with the value prop -Ahmed */}
+            {/* bar color switches from primary (blue) to success (green) once the threshold is hit -Ahmed */}
+            <LinearProgress
+              variant="determinate"
+              value={progressPct}
+              sx={{
+                height: 8,
+                borderRadius: 4,
+                bgcolor: 'action.disabledBackground',
+                '& .MuiLinearProgress-bar': {
+                  borderRadius: 4,
+                  bgcolor: discountUnlocked ? 'success.main' : 'primary.main',
+                },
+              }}
+            />
 
-  <Box sx={{ display: 'flex', gap: 3 }}>
-    <Typography variant="h6" color="text.secondary">
-      Total
-    </Typography>
+            {/* small labels below the bar showing current subtotal on the left and the $200 goal on the right -Ahmed */}
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 0.5 }}>
+              <Typography variant="caption" color="text.secondary">${subtotal.toFixed(2)}</Typography>
+              <Typography variant="caption" color="text.secondary">$200.00</Typography>
+            </Box>
+          </Box>
 
-    <Typography variant="h5" fontWeight={700} color="text.primary">
-      ${total.toFixed(2)}
-    </Typography>
-  </Box>
-</Box>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 3 }}>
+            <Typography variant="h6" color="text.secondary">
+              Total
+            </Typography>
+            <Box sx={{ textAlign: 'right' }}>
+              {/* strikethrough of the original subtotal — only visible after the discount is unlocked -Ahmed */}
+              {discountUnlocked && (
+                <Typography variant="body2" color="text.disabled" sx={{ textDecoration: 'line-through' }}>
+                  ${subtotal.toFixed(2)}
+                </Typography>
+              )}
+              {/* final total — turns green and appends "(50% off)" label when discount is active -Ahmed */}
+              <Typography variant="h5" fontWeight={700} color={discountUnlocked ? 'success.dark' : 'text.primary'}>
+                ${total.toFixed(2)}
+                {discountUnlocked && (
+                  <Typography component="span" variant="body2" fontWeight={600} color="success.dark" sx={{ ml: 1 }}>
+                    (50% off)
+                  </Typography>
+                )}
+              </Typography>
+            </Box>
+          </Box>
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
             <Button
               variant="contained"

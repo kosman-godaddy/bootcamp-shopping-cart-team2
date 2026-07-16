@@ -1,3 +1,4 @@
+//functionality for favoriting items on the shop page (adding, removing, checks to see if it is already added) -Nyla
 import React, { createContext, useContext, useState } from 'react';
 
 const FavoritesContext = createContext();
