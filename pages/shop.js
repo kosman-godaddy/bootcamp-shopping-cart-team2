@@ -9,7 +9,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import DarkModeToggle from '../components/DarkModeToggle';
 
 function ShopPage() { // main shop page, displays hearts for favorited items -Nyla
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(''); // tracks what the user types in the search bar - Ahmed
 
   return <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
     <Box sx={{ bgcolor: 'background.paper', borderBottom: '1px solid', borderColor: 'divider', py: 2 }}>
@@ -31,7 +31,9 @@ function ShopPage() { // main shop page, displays hearts for favorited items -Ny
           <DarkModeToggle />
         </Box>
       </Container>
+      {/* search bar row — flex so a filter button can be added next to it later - Ahmed */}
       <Container maxWidth="lg" sx={{ mt: 2, display: 'flex', gap: 1 }}>
+        {/* search input field - Ahmed */}
         <TextField
           size="small"
           sx={{ flex: 1, maxWidth: '95.3%', bgcolor: 'background.default', borderRadius: 1 }}
