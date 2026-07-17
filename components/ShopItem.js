@@ -21,6 +21,9 @@ const productDetails = {
   3: 'Register a .com domain — the world\'s most recognized top-level domain (TLD). A .com address is trusted by consumers worldwide and is ideal for businesses, e-commerce, and professional brands. Includes a full year of registration, free WHOIS privacy protection to keep your personal contact info hidden, and DNS management through GoDaddy\'s control panel. Renews annually at the standard rate.',
   4: 'Register a .org domain, widely recognized as the TLD of choice for nonprofits, charities, open-source projects, and community organizations. A .org address signals credibility and public purpose to your audience. Includes a full year of registration, WHOIS privacy, and full DNS control. Renews annually.',
   5: 'Register a .co domain — the rising alternative to .com favored by startups, tech companies, and entrepreneurs worldwide. Short, memorable, and globally understood as a business extension. A .co domain is a strong choice when your preferred .com is taken. Includes a full year of registration, WHOIS privacy protection, and complete DNS management. Currently on sale — a great time to lock in your brand.',
+  6: "Warning: may cause overwhelming joy. Glazed to perfection, these Donuts will make your Do'main experience all the better.",
+  7: "I know your sick of Ubering from the Hotel to the Office, why not just skip the wait!",
+  8: "FREE In-N-Out, Courtesy of Austin & Suzeth",
 };
 
 function ShopItem({ product, onAddToCart }) {
