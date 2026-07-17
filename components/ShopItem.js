@@ -72,14 +72,15 @@ function ShopItem({ product, onAddToCart, stockRemaining = 5 }) {
   return (
     <>
     <Card sx={{
-      width: 220,
-      m: '12px',
+      width: 235,
+      m: '10px',
       display: 'flex',
       flexDirection: 'column',
       boxShadow: '0 1px 4px rgba(0,0,0,0.10)',
+      borderRadius: 2,
       transition: 'box-shadow 0.2s, transform 0.2s',
       '&:hover': {
-        boxShadow: '0 4px 16px rgba(0,0,0,0.14)',
+        boxShadow: '0 6px 20px rgba(0,0,0,0.13)',
         transform: 'translateY(-2px)',
       },
     }}>
@@ -132,60 +133,67 @@ function ShopItem({ product, onAddToCart, stockRemaining = 5 }) {
   </IconButton>
   </Box>
 
-      <CardContent sx={{ flexGrow: 1, pb: 0 }}>
-        <Typography variant="subtitle1" fontWeight={600} noWrap gutterBottom>
+      <CardContent sx={{ flexGrow: 1, pb: 0, px: 1.75, pt: 1.5 }}>
+        <Typography variant="subtitle2" fontWeight={700} noWrap sx={{ mb: 0.5, fontSize: '0.85rem' }}>
           {product.name}
         </Typography>
         <Typography
-          variant="body2"
+          variant="caption"
           color="text.secondary"
           sx={{
             display: '-webkit-box',
             WebkitLineClamp: 2,
             WebkitBoxOrient: 'vertical',
             overflow: 'hidden',
-            minHeight: 40,
-            mb: 1,
+            lineHeight: 1.55,
+            mb: 1.25,
           }}
         >
           {product.description}
         </Typography>
 
-        {onSale ? (
-          <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
-            <Typography variant="h6" fontWeight={700} color="error.main">
-              ${Number(product.sale_price).toFixed(2)}
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ textDecoration: 'line-through' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 0.5 }}>
+          {onSale ? (
+            <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.5 }}>
+              <Typography variant="subtitle1" fontWeight={800} color="error.main" sx={{ fontSize: '1rem' }}>
+                ${Number(product.sale_price).toFixed(2)}
+              </Typography>
+              <Typography variant="caption" color="text.secondary" sx={{ textDecoration: 'line-through' }}>
+                ${Number(product.price).toFixed(2)}
+              </Typography>
+            </Box>
+          ) : (
+            <Typography variant="subtitle1" fontWeight={800} color="text.primary" sx={{ fontSize: '1rem' }}>
               ${Number(product.price).toFixed(2)}
             </Typography>
-          </Box>
-        ) : (
-          <Typography variant="h6" fontWeight={700} color="text.primary">
-            ${Number(product.price).toFixed(2)}
-          </Typography>
-        )}
+          )}
 
-        {rating != null && (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mt: 1 }}>
-            <StarRoundedIcon sx={{ fontSize: 13, color: ratingColor, flexShrink: 0 }} />
-            <Box sx={{ flex: 1, height: 4, borderRadius: 2, bgcolor: 'action.hover', overflow: 'hidden' }}>
-              <Box sx={{
-                height: '100%',
-                width: `${(rating / 5) * 100}%`,
-                bgcolor: ratingColor,
-                borderRadius: 2,
-              }} />
+          {rating != null && (
+            <Box sx={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 0.35,
+              px: 0.8,
+              py: 0.3,
+              borderRadius: 99,
+              bgcolor: ratingColor + '18',
+              border: '1px solid',
+              borderColor: ratingColor + '55',
+              flexShrink: 0,
+            }}>
+              <StarRoundedIcon sx={{ fontSize: 11, color: ratingColor }} />
+              <Typography variant="caption" fontWeight={800} sx={{ color: ratingColor, lineHeight: 1, fontSize: '0.7rem' }}>
+                {rating.toFixed(1)}
+              </Typography>
             </Box>
-            <Typography variant="caption" fontWeight={700} sx={{ color: ratingColor, minWidth: 22, textAlign: 'right' }}>
-              {rating.toFixed(1)}
-            </Typography>
-          </Box>
-        )}
+          )}
+        </Box>
       </CardContent>
 
+      <Divider sx={{ mx: 1.75, mt: 1.25, opacity: 0.5 }} />
+
       {/* Dropdown toggle button - Ian */}
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5, pt: 0.5 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5, pt: 0.25, pb: 0.25 }}>
         <Typography variant="caption" color="text.secondary" sx={{ fontSize: 11, userSelect: 'none' }}>Details</Typography>
         <IconButton
           size="small"
@@ -204,7 +212,6 @@ function ShopItem({ product, onAddToCart, stockRemaining = 5 }) {
 
       {/* Collapsible details section - Ian */}
       <Collapse in={expanded} timeout="auto" unmountOnExit>
-        <Divider sx={{ mx: 2 }} />
         <CardContent sx={{ pt: 1, pb: 1.5 }}>
 
           {/* Detailed product description - distinct from the brief card summary above */}
@@ -260,7 +267,7 @@ function ShopItem({ product, onAddToCart, stockRemaining = 5 }) {
         </CardContent>
       </Collapse>
 
-      <CardActions sx={{ px: 2, pb: 2, pt: 1 }}>
+      <CardActions sx={{ px: 1.75, pb: 1.75, pt: 0.75 }}>
         <Button
           onClick={handleAddToCartClick}
           variant="contained"
