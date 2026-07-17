@@ -5,9 +5,9 @@
 
 ## Preqrequities
 
-- NodeJS v20+
-- Visual Studio Code
-- Git
+1. NodeJS v20+
+2. Visual Studio Code
+3. Git
 
 To get started, fork this repo
 ```
@@ -45,11 +45,11 @@ So how do you build a web application? At the very simplest level, a webapp resp
 
 ### What is a framework?
 Web frameworks are collections of code that automate and provide common solutions to many problems that you will need to solve to build a web application. Their features typically include but are certainly not limited to:
-- Templating and code reuse: Sharing layouts and inserting dynamic content into pages
-- Authentication and session management: Creating accounts and logging in securely.
-- Routing: Mapping URLs to code handlers
-- File bundling and optimization
-- Configuration management
+1. Templating and code reuse: Sharing layouts and inserting dynamic content into pages
+2. Authentication and session management: Creating accounts and logging in securely.
+3. Routing: Mapping URLs to code handlers
+4. File bundling and optimization
+5. Configuration management
 
 > Aside: What is the difference between a library and a framework? Both are collections of code written bundled separately and included in your application. Put simply: Your code invokes library code, and framework code invokes your code!
 
@@ -64,17 +64,17 @@ To use Gasket, we would normally to install it into our project via NPM (Node Pa
 
 ### Framework skeleton
 Alright, enough talk, let's look at some code. After creating a new Gasket app with the Next.js preset, we get a few key things:
-- Some config files that we'll ignore for now (`gasket.config.js`, `package.json`, `jest.config.js`)
-- The components directory, with one component: [`head.js`](./components/head.js)
-- The pages directory, with 3 files:
-  - [`_app.js`](./pages/_app.js)
-  - [`_document.js`](./pages/_document.js)
-  - [`index.js`](./pages/index.js)
+1. Some config files that we'll ignore for now (`gasket.config.js`, `package.json`, `jest.config.js`)
+2. The components directory, with one component: [`head.js`](./components/head.js)
+3. The pages directory, with 3 files:
+   1. [`_app.js`](./pages/_app.js)
+   2. [`_document.js`](./pages/_document.js)
+   3. [`index.js`](./pages/index.js)
 
 We'll talk more about pages and components in a moment, but I want to make a couple of brief notes on these:
-- `head.js` is a simple React component that encapsulates what we'd put in the `<head>` element on every page. This is a great example of how web frameworks are a big boost over writing out pages by hand - we can just re-use that component everywhere and inject the variable values that we need!
-- In Nextjs, files in the `pages/` directory map to route names, with `index.js` being a special case that routes to `/`. Visit `http://localhost:8080` to view the page, and edit the text and save the file to see it reload in real time!
-- If you want global css styles, import them into [`_app.js`](./pages/_app.js).
+1. `head.js` is a simple React component that encapsulates what we'd put in the `<head>` element on every page. This is a great example of how web frameworks are a big boost over writing out pages by hand - we can just re-use that component everywhere and inject the variable values that we need!
+2. In Nextjs, files in the `pages/` directory map to route names, with `index.js` being a special case that routes to `/`. Visit `http://localhost:8080` to view the page, and edit the text and save the file to see it reload in real time!
+3. If you want global css styles, import them into [`_app.js`](./pages/_app.js).
 
 One last thing to remember - it's ok to not understand everything that's going on in these generated files! One of the most important skills to learn as a web developer is the ability to accept some "magic" and focus your attention where it really matters. There will always be time to learn about features in-depth later when you need to use them.
 
@@ -86,9 +86,9 @@ api.add_route('/v1/products/{product_id:int}', Product())
 ```
 
 For UI pages in Next.js, the framework is even more opinionated: each file in the `pages/` that exports a React component automatically gets its own route. We discussed the special case of `pages/index.js` already, which is mapped to the root route `/`. New files will get pages that correspond to their name, and you can create folder structures to nest pages. For example:
-- `pages/about.js` will map to `/about`
-- `/pages/blog/posts.js` will map to `/blog/posts`
-- `/pages/blog/posts/[id].js` will create a dynamic route for `/blog/posts/{id}`. We won't be discussing dynamic Next.js routing today, but you can check out the docs for more information: https://nextjs.org/docs/app/api-reference/file-conventions/dynamic-routes
+1. `pages/about.js` will map to `/about`
+2. `/pages/blog/posts.js` will map to `/blog/posts`
+3. `/pages/blog/posts/[id].js` will create a dynamic route for `/blog/posts/{id}`. We won't be discussing dynamic Next.js routing today, but you can check out the docs for more information: https://nextjs.org/docs/app/api-reference/file-conventions/dynamic-routes
 
 Remember the products API you created? Let's create a page to browse products at the `/shop` route. We don't have any components to include yet, so for now we'll just add a title (`"My shop"`) and a link to another page, the cart page. The Next.js [Link component](https://nextjs.org/docs/13/app/api-reference/components/link) works a lot like an `<a>` tag, but with some framework magic sprinkled in.
 
@@ -258,8 +258,8 @@ console.log(result)
 ```
 
 Instead of `25` we got a `Promise` object with some properties. We won't go too deeply into the details of what a `Promise` is here, but here are the key things to know:
-- Promises are wrappers around some result value, which could be anything - a number, a string, an object.
-- Promises have internal state managed by the javascript engine, and you can hook functions into these lifecycle changes - for example, when it is fulfilled.
+1. Promises are wrappers around some result value, which could be anything - a number, a string, an object.
+2. Promises have internal state managed by the javascript engine, and you can hook functions into these lifecycle changes - for example, when it is fulfilled.
 
 The easiest way to obtain the result of an `Promise` (and by extention, `async` functions), is to use the `await` keyword:
 
@@ -352,13 +352,33 @@ const result = await fetch('https://example.com/answer', options).then(response 
 
 Now go forth and fetch!
 
+### WHOIS
+
+WHOIS is a query and response protocol used to look up registration information about internet resources such as domain names and IP addresses. When you run a WHOIS query on a domain, you can find out:
+
+1. The registrar — the company that manages the domain registration (e.g. GoDaddy, Namecheap)
+2. Registrant contact details — who owns or registered the domain
+3. Registration and expiration dates — when the domain was first registered and when it expires
+4. Name servers — which DNS servers are authoritative for the domain
+5. Domain status — whether the domain is active, locked, pending deletion, etc.
+
+You can run a WHOIS query directly from your terminal:
+
+```bash
+whois example.com
+```
+
+Or use a web-based tool like the ICANN lookup: https://lookup.icann.org/
+
+As a web developer, WHOIS is useful when you need to verify domain ownership, check whether a domain name is available, troubleshoot DNS routing issues, or find the right contact for a domain-related question.
+
 ## Links
 
 Gasket: https://github.com/godaddy/gasket
-- Gasket Plugins:  https://gasket.dev/#/README
+1. Gasket Plugins: https://gasket.dev/#/README
 
 Training URLS:
-- Pluralsight
-  - React Track: https://www.pluralsight.com/browse/software-development/react
-  - React Fundamentals: https://www.pluralsight.com/courses/react-fundamentals-update
-  - React Component App: https://www.pluralsight.com/projects/build-a-quiz-component-with-react
+1. Pluralsight
+   1. React Track: https://www.pluralsight.com/browse/software-development/react
+   2. React Fundamentals: https://www.pluralsight.com/courses/react-fundamentals-update
+   3. React Component App: https://www.pluralsight.com/projects/build-a-quiz-component-with-react

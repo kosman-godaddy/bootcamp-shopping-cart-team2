@@ -1,7 +1,10 @@
 import React from 'react';
-import { Card, CardContent, CardActions, CardMedia, Snackbar, Alert, Typography, Button, Chip, Box, IconButton } from '@mui/material';
+import { Card, CardContent, CardActions, CardMedia, Snackbar, Alert, Typography, Button, Chip, Box, IconButton, Collapse, Divider, Rating } from '@mui/material';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import LocalOfferIcon from '@mui/icons-material/LocalOffer';
+import InventoryIcon from '@mui/icons-material/Inventory';
 import { useFavorites } from '../context/FavoritesContext';
 
 const productImages = {
@@ -12,10 +15,19 @@ const productImages = {
   5: 'https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=400&h=200&fit=crop', // modern startup office
 };
 
+const productDetails = {
+  1: 'A Domain Validation (DV) SSL certificate that encrypts data between your visitors and your website. Once installed, browsers display a padlock in the address bar and serve your site over HTTPS — signaling to visitors that their connection is secure. Ideal for blogs, small business sites, and personal projects that handle logins or contact forms. Covers a single domain (e.g. example.com) and is typically issued within minutes.',
+  2: 'A Wildcard SSL certificate secures your primary domain and an unlimited number of its subdomains (e.g. shop.example.com, mail.example.com, api.example.com) with a single certificate. This eliminates the cost and hassle of buying separate certificates for each subdomain. Perfect for growing businesses with multiple services or staging environments. Uses the same strong encryption as a standard certificate, just with broader coverage.',
+  3: 'Register a .com domain — the world\'s most recognized top-level domain (TLD). A .com address is trusted by consumers worldwide and is ideal for businesses, e-commerce, and professional brands. Includes a full year of registration, free WHOIS privacy protection to keep your personal contact info hidden, and DNS management through GoDaddy\'s control panel. Renews annually at the standard rate.',
+  4: 'Register a .org domain, widely recognized as the TLD of choice for nonprofits, charities, open-source projects, and community organizations. A .org address signals credibility and public purpose to your audience. Includes a full year of registration, WHOIS privacy, and full DNS control. Renews annually.',
+  5: 'Register a .co domain — the rising alternative to .com favored by startups, tech companies, and entrepreneurs worldwide. Short, memorable, and globally understood as a business extension. A .co domain is a strong choice when your preferred .com is taken. Includes a full year of registration, WHOIS privacy protection, and complete DNS management. Currently on sale — a great time to lock in your brand.',
+};
+
 function ShopItem({ product, onAddToCart }) {
   // Track whether the "added to cart" toast notification is visible and what message it shows
   const [toastOpen, setToastOpen] = React.useState(false);
   const [toastMessage, setToastMessage] = React.useState('');
+  const [expanded, setExpanded] = React.useState(false); // Expandable dropdown for product details - Ian
 
   const { toggleFavorite, isFavorited: checkFavorited } = useFavorites(); //Check if product is favorited - Nyla
 
@@ -130,9 +142,79 @@ function ShopItem({ product, onAddToCart }) {
         )}
       </CardContent>
 
+      {/* Dropdown toggle button - Ian */}
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5, pt: 0.5 }}>
+        <Typography variant="caption" color="text.secondary" sx={{ fontSize: 11, userSelect: 'none' }}>Details</Typography>
+        <IconButton
+          size="small"
+          onClick={() => setExpanded(prev => !prev)}
+          aria-expanded={expanded}
+          aria-label="show more"
+          sx={{
+            transition: 'transform 0.2s',
+            transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
+            color: 'text.secondary',
+          }}
+        >
+          <ExpandMoreIcon fontSize="small" />
+        </IconButton>
+      </Box>
+
+      {/* Collapsible details section - Ian */}
+      <Collapse in={expanded} timeout="auto" unmountOnExit>
+        <Divider sx={{ mx: 2 }} />
+        <CardContent sx={{ pt: 1, pb: 1.5 }}>
+
+          {/* Detailed product description - distinct from the brief card summary above */}
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 1, lineHeight: 1.6, fontSize: 12 }}>
+            {productDetails[product.id] || product.description}
+          </Typography>
+
+          {/* Visual star rating - Ian */}
+          {product.rating != null && (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 0.5 }}>
+              <Rating value={Number(product.rating)} precision={0.5} size="small" readOnly />
+              <Typography variant="caption" color="text.secondary">
+                {Number(product.rating).toFixed(1)} / 5
+              </Typography>
+            </Box>
+          )}
+
+          {/* Category chip - Ian */}
+          {product.category && (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 0.5 }}>
+              <LocalOfferIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+              <Chip label={product.category} size="small" variant="outlined" sx={{ height: 20, fontSize: 11 }} />
+            </Box>
+          )}
+
+          {/* Color-coded stock status - Ian */}
+          {product.stock != null && (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 0.5 }}>
+              <InventoryIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+              <Typography variant="caption" fontWeight={600} sx={{
+                color: product.stock === 0 ? 'error.main' : product.stock <= 5 ? 'warning.main' : 'success.main',
+              }}>
+                {product.stock === 0 ? 'Out of stock' : product.stock <= 5 ? `Low stock — only ${product.stock} left` : `In stock (${product.stock})`}
+              </Typography>
+            </Box>
+          )}
+
+          {/* Sale savings banner - Ian */}
+          {onSale && (
+            <Box sx={{ mb: 0.75, p: '4px 8px', backgroundColor: 'rgba(211,47,47,0.08)', borderRadius: 1, border: '1px solid', borderColor: 'error.light' }}>
+              <Typography variant="caption" color="error.main" fontWeight={700}>
+                Save ${(Number(product.price) - Number(product.sale_price)).toFixed(2)} ({Math.round(((Number(product.price) - Number(product.sale_price)) / Number(product.price)) * 100)}% off)
+              </Typography>
+            </Box>
+          )}
+
+        </CardContent>
+      </Collapse>
+
       <CardActions sx={{ px: 2, pb: 2, pt: 1 }}>
         <Button
-          onClick={handleAddToCartClick} //When clicked, calls the handleAddToCartClick function, which will call the onAddToCart function passed as a prop and show a toast notification. -Ian
+          onClick={handleAddToCartClick}
           variant="contained"
           fullWidth
           size="small"

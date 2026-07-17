@@ -51,7 +51,7 @@ function ShoppingItemList({ searchQuery = '' }) { // searchQuery comes from the 
   );
 
   return (
-    <Grid container direction="row" spacing={1}>
+    <Grid container direction="row" spacing={1} alignItems="flex-start">
       {filteredProducts.map((product) => (
         <ShopItem key={product.id} product={product} onAddToCart={handleAddToCart} />
       ))}

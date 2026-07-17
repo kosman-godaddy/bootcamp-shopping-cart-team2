@@ -35,6 +35,7 @@
     "redux": "^4.0.5"
   },
   "devDependencies": {
+    "playwright": "^1.61.1",
     "webpack": "^5.89.0"
   }
 }

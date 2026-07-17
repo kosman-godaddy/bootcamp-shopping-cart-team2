@@ -31,6 +31,7 @@ function Cart() {
   const [promoInput, setPromoInput] = useState('');
   const [promoError, setPromoError] = useState('');
 
+  // Validates the typed promo code against PROMO_CODES; replaced a dropdown so any code can be entered without exposing the full list -Ian
   const handleApplyPromo = () => {
     const match = PROMO_CODES.find((p) => p.code === promoInput.trim());
     if (match) {
@@ -83,7 +84,8 @@ function Cart() {
     setCheckingOut(true);
   };
 
-  const fireConfetti = () => { // Function to fire confetti animation - Ian
+  // Shoots confetti from both screen edges for 3 seconds after a successful order; uses canvas-confetti's rAF loop -Ian
+  const fireConfetti = () => {
     const duration = 3000;
     const end = Date.now() + duration;
     const frame = () => {
@@ -300,7 +302,7 @@ function Cart() {
             </Box>
           </Box>
 
-          {/* Promo code input + price breakdown */}
+          {/* Promo code text input — replaced the original dropdown so users can type any code without seeing the full list -Ian */}
           <Box sx={{ mb: 3, p: 2, borderRadius: 2, border: '1px solid #e0e0e0' }}>
             <Typography variant="body2" fontWeight={600} sx={{ mb: 1.5 }}>
               Promo Code
