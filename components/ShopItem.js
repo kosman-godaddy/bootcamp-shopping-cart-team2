@@ -6,6 +6,8 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import StarRoundedIcon from '@mui/icons-material/StarRounded';
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
 import { useFavorites } from '../context/FavoritesContext';
 
 // Fallback images keyed by product ID — only used when the product has no image_url in the DB -Ian
@@ -29,7 +31,7 @@ const productDetails = {
   16: "FREE In-N-Out, Courtesy of Austin & Suzeth",
 };
 
-function ShopItem({ product, onAddToCart, stockRemaining = 5 }) {
+function ShopItem({ product, onAddToCart, onDecrement, cartQuantity = 0 }) {
   // Track whether the "added to cart" toast notification is visible and what message it shows
   const [toastOpen, setToastOpen] = React.useState(false);
   const [toastMessage, setToastMessage] = React.useState('');
@@ -44,8 +46,6 @@ function ShopItem({ product, onAddToCart, stockRemaining = 5 }) {
   const image = product.image_url || productImages[Number(product.id)];
 
   const onSale = product.is_on_sale && product.sale_price != null;
-  const outOfStock = stockRemaining <= 0;
-  const lowStock = !outOfStock && stockRemaining <= 2;
   const isFavorited = checkFavorited(product.id);
 
   const rating = product.rating != null ? Number(product.rating) : null;
@@ -95,28 +95,14 @@ function ShopItem({ product, onAddToCart, stockRemaining = 5 }) {
     alt={product.name}
     sx={{ objectFit: 'cover', backgroundColor: '#f5f5f5' }}
   />
-  {outOfStock ? (
-    <Chip
-      label="Out of Stock"
-      color="default"
-      size="small"
-      sx={{ position: 'absolute', top: 8, right: 8, fontWeight: 700, bgcolor: '#616161', color: '#fff' }}
-    />
-  ) : onSale ? (
+  {onSale && (
     <Chip
       label="Sale"
       color="error"
       size="small"
       sx={{ position: 'absolute', top: 8, right: 8, fontWeight: 700 }}
     />
-  ) : lowStock ? (
-    <Chip
-      label={`Only ${stockRemaining} left`}
-      color="warning"
-      size="small"
-      sx={{ position: 'absolute', top: 8, right: 8, fontWeight: 700 }}
-    />
-  ) : null}
+  )}
   <IconButton
     onClick={handleFavoriteClick}
     size="small"
@@ -260,16 +246,35 @@ function ShopItem({ product, onAddToCart, stockRemaining = 5 }) {
       </Collapse>
 
       <CardActions sx={{ px: 1.75, pb: 1.75, pt: 0.75 }}>
-        <Button
-          onClick={handleAddToCartClick}
-          variant="contained"
-          fullWidth
-          size="small"
-          disableElevation
-          disabled={outOfStock}
-        >
-          {outOfStock ? 'Out of Stock' : 'Add to Cart'}
-        </Button>
+        {cartQuantity === 0 ? (
+          <Button
+            onClick={handleAddToCartClick}
+            variant="contained"
+            fullWidth
+            size="small"
+            disableElevation
+          >
+            Add to Cart
+          </Button>
+        ) : (
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+            <IconButton
+              size="small"
+              onClick={() => onDecrement(product)}
+              sx={{ border: '1px solid', borderColor: 'divider' }}
+            >
+              <RemoveIcon fontSize="small" />
+            </IconButton>
+            <Typography variant="body2" fontWeight={700}>{cartQuantity}</Typography>
+            <IconButton
+              size="small"
+              onClick={() => onAddToCart(product)}
+              sx={{ border: '1px solid', borderColor: 'divider' }}
+            >
+              <AddIcon fontSize="small" />
+            </IconButton>
+          </Box>
+        )}
       </CardActions>
     </Card>
 
