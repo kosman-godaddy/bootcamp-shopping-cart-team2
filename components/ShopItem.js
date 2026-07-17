@@ -26,7 +26,7 @@ const productDetails = {
   8: "FREE In-N-Out, Courtesy of Austin & Suzeth",
 };
 
-function ShopItem({ product, onAddToCart }) {
+function ShopItem({ product, onAddToCart, stockRemaining = 5 }) {
   // Track whether the "added to cart" toast notification is visible and what message it shows
   const [toastOpen, setToastOpen] = React.useState(false);
   const [toastMessage, setToastMessage] = React.useState('');
@@ -41,6 +41,8 @@ function ShopItem({ product, onAddToCart }) {
   const image = product.image_url || productImages[Number(product.id)];
 
   const onSale = product.is_on_sale && product.sale_price != null;   // onSale is only true when both the sale flag is set AND a sale price actually exists
+  const outOfStock = stockRemaining <= 0;
+  const lowStock = !outOfStock && stockRemaining <= 2;
   
   const isFavorited = checkFavorited(product.id); // Check if this specific product is in the user's favorites list - Nyla
 
@@ -83,14 +85,28 @@ function ShopItem({ product, onAddToCart }) {
     alt={product.name}
     sx={{ objectFit: 'cover', backgroundColor: '#f5f5f5' }}
   />
-  {onSale && (
+  {outOfStock ? (
+    <Chip
+      label="Out of Stock"
+      color="default"
+      size="small"
+      sx={{ position: 'absolute', top: 8, right: 8, fontWeight: 700, bgcolor: '#616161', color: '#fff' }}
+    />
+  ) : onSale ? (
     <Chip
       label="Sale"
       color="error"
       size="small"
       sx={{ position: 'absolute', top: 8, right: 8, fontWeight: 700 }}
     />
-  )}
+  ) : lowStock ? (
+    <Chip
+      label={`Only ${stockRemaining} left`}
+      color="warning"
+      size="small"
+      sx={{ position: 'absolute', top: 8, right: 8, fontWeight: 700 }}
+    />
+  ) : null}
   <IconButton
     onClick={handleFavoriteClick}
     size="small"
@@ -222,8 +238,9 @@ function ShopItem({ product, onAddToCart }) {
           fullWidth
           size="small"
           disableElevation
+          disabled={outOfStock}
         >
-          Add to Cart
+          {outOfStock ? 'Out of Stock' : 'Add to Cart'}
         </Button>
       </CardActions>
     </Card>
