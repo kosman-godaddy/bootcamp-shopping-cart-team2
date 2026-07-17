@@ -5,6 +5,7 @@ import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import InventoryIcon from '@mui/icons-material/Inventory';
+import StarRoundedIcon from '@mui/icons-material/StarRounded';
 import { useFavorites } from '../context/FavoritesContext';
 
 const productImages = {
@@ -40,11 +41,16 @@ function ShopItem({ product, onAddToCart, stockRemaining = 5 }) {
   // Use the product's own image URL if it has one, or use productImages above
   const image = product.image_url || productImages[Number(product.id)];
 
-  const onSale = product.is_on_sale && product.sale_price != null;   // onSale is only true when both the sale flag is set AND a sale price actually exists
+  const onSale = product.is_on_sale && product.sale_price != null;
   const outOfStock = stockRemaining <= 0;
   const lowStock = !outOfStock && stockRemaining <= 2;
-  
-  const isFavorited = checkFavorited(product.id); // Check if this specific product is in the user's favorites list - Nyla
+  const isFavorited = checkFavorited(product.id);
+
+  const rating = product.rating != null ? Number(product.rating) : null;
+  const ratingColor = rating == null ? '#9e9e9e'
+    : rating >= 4   ? '#2e7d32'
+    : rating >= 3   ? '#f57c00'
+    : '#c62828';
 
   
   const handleFavoriteClick = () => { // Add/Remove product froom favrites when heart is clicked - Nyla
@@ -159,6 +165,23 @@ function ShopItem({ product, onAddToCart, stockRemaining = 5 }) {
             ${Number(product.price).toFixed(2)}
           </Typography>
         )}
+
+        {rating != null && (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mt: 1 }}>
+            <StarRoundedIcon sx={{ fontSize: 13, color: ratingColor, flexShrink: 0 }} />
+            <Box sx={{ flex: 1, height: 4, borderRadius: 2, bgcolor: 'action.hover', overflow: 'hidden' }}>
+              <Box sx={{
+                height: '100%',
+                width: `${(rating / 5) * 100}%`,
+                bgcolor: ratingColor,
+                borderRadius: 2,
+              }} />
+            </Box>
+            <Typography variant="caption" fontWeight={700} sx={{ color: ratingColor, minWidth: 22, textAlign: 'right' }}>
+              {rating.toFixed(1)}
+            </Typography>
+          </Box>
+        )}
       </CardContent>
 
       {/* Dropdown toggle button - Ian */}
@@ -189,12 +212,18 @@ function ShopItem({ product, onAddToCart, stockRemaining = 5 }) {
             {productDetails[product.id] || product.description}
           </Typography>
 
-          {/* Visual star rating - Ian */}
-          {product.rating != null && (
+          {rating != null && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 0.5 }}>
-              <Rating value={Number(product.rating)} precision={0.5} size="small" readOnly />
-              <Typography variant="caption" color="text.secondary">
-                {Number(product.rating).toFixed(1)} / 5
+              <Rating
+                value={rating}
+                precision={0.5}
+                size="small"
+                readOnly
+                icon={<StarRoundedIcon fontSize="inherit" sx={{ color: ratingColor }} />}
+                emptyIcon={<StarRoundedIcon fontSize="inherit" sx={{ opacity: 0.25 }} />}
+              />
+              <Typography variant="caption" sx={{ color: ratingColor, fontWeight: 600 }}>
+                {rating.toFixed(1)} / 5
               </Typography>
             </Box>
           )}

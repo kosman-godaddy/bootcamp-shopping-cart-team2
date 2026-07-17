@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Grid } from '@mui/material'
 import ShopItem from './ShopItem';
 
-function ShoppingItemList({ searchQuery = '' }) { // searchQuery comes from the search bar on the shop page - Ahmed
+function ShoppingItemList({ searchQuery = '', sortBy = 'default', priceRange = 'all', statusFilter = 'all', filterCategory = 'all', onCategoriesLoaded }) {
 
   const [products, setProducts] = useState([]);
   const [cartItems, setCartItems] = useState([]);
@@ -14,15 +14,17 @@ function ShoppingItemList({ searchQuery = '' }) { // searchQuery comes from the 
     ]);
     const productData = await productRes.json();
     const cartData = await cartRes.json();
-    setProducts(Array.isArray(productData) ? productData : productData.products ?? []);
+    const list = Array.isArray(productData) ? productData : productData.products ?? [];
+    setProducts(list);
     setCartItems(Array.isArray(cartData) ? cartData : []);
+    const cats = [...new Set(list.map((p) => p.category).filter(Boolean))].sort();
+    onCategoriesLoaded?.(cats);
   };
 
   useEffect(() => { fetchData(); }, []);
 
   const handleAddToCart = async (product) => {
     const existing = cartItems.find((item) => item.name === product.name);
-
     if (existing) {
       await fetch(`http://localhost:8000/v1/cartitems/${existing.id}`, {
         method: 'PATCH',
@@ -49,10 +51,40 @@ function ShoppingItemList({ searchQuery = '' }) { // searchQuery comes from the 
     return item ? item.quantity : 0;
   };
 
-  // only show products whose name contains the search text - Ahmed
-  const filteredProducts = products.filter((p) =>
-    p.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredProducts = products
+    .filter((p) => p.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    .filter((p) => {
+      if (filterCategory === 'all') return true;
+      // Everyday Thingz: non-serious/non-domain items matched by name -Ian
+      if (filterCategory === 'everyday_things') {
+        const name = p.name.toLowerCase();
+        return name.includes('lambo') || name.includes('donut') || name.includes('burger') || name.includes('in-n-out');
+      }
+      return p.category === filterCategory;
+    })
+    .filter((p) => {
+      if (statusFilter === 'in_stock') return p.stock > 0;
+      if (statusFilter === 'on_sale')  return p.is_on_sale;
+      return true;
+    })
+    .filter((p) => {
+      const price = p.is_on_sale && p.sale_price != null ? p.sale_price : p.price;
+      if (priceRange === 'under_25') return price < 25;
+      if (priceRange === '25_50')    return price >= 25 && price <= 50;
+      if (priceRange === '50_100')   return price >= 50 && price <= 100;
+      if (priceRange === 'over_100') return price > 100;
+      return true;
+    })
+    .sort((a, b) => {
+      const priceA = a.is_on_sale && a.sale_price != null ? a.sale_price : a.price;
+      const priceB = b.is_on_sale && b.sale_price != null ? b.sale_price : b.price;
+      if (sortBy === 'price_asc')   return priceA - priceB;
+      if (sortBy === 'price_desc')  return priceB - priceA;
+      if (sortBy === 'name_asc')    return a.name.localeCompare(b.name);
+      if (sortBy === 'name_desc')   return b.name.localeCompare(a.name);
+      if (sortBy === 'rating_desc') return (b.rating ?? 0) - (a.rating ?? 0);
+      return 0;
+    });
 
   return (
     <Grid container direction="row" spacing={1} alignItems="flex-start">

@@ -2,15 +2,29 @@ import React, { useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import ShopItemList from '../components/ShopItemList';
-import { Container, Typography, Button, Box, TextField, InputAdornment } from '@mui/material';
+import { Container, Typography, Button, Box, TextField, InputAdornment, Select, MenuItem, FormControl, InputLabel, Popover } from '@mui/material';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import SearchIcon from '@mui/icons-material/Search';
+import TuneIcon from '@mui/icons-material/Tune';
 import DarkModeToggle from '../components/DarkModeToggle';
 
 function ShopPage() { // main shop page, displays hearts for favorited items -Nyla
-  const [searchQuery, setSearchQuery] = useState(''); // tracks what the user types in the search bar - Ahmed
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState('default');
+  const [priceRange, setPriceRange] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [filterCategory, setFilterCategory] = useState('all');
+  const [availableCategories, setAvailableCategories] = useState([]);
+  const [filterAnchorEl, setFilterAnchorEl] = useState(null);
+
+  const activeFilterCount = [
+    sortBy !== 'default',
+    priceRange !== 'all',
+    statusFilter !== 'all',
+    filterCategory !== 'all',
+  ].filter(Boolean).length;
 
   return <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
     <Box sx={{ bgcolor: 'background.paper', borderBottom: '1px solid', borderColor: 'divider', py: 2 }}>
@@ -37,12 +51,10 @@ function ShopPage() { // main shop page, displays hearts for favorited items -Ny
           <DarkModeToggle />
         </Box>
       </Container>
-      {/* search bar row — flex so a filter button can be added next to it later - Ahmed */}
       <Container maxWidth="lg" sx={{ mt: 2, display: 'flex', gap: 1 }}>
-        {/* search input field - Ahmed */}
         <TextField
           size="small"
-          sx={{ flex: 1, maxWidth: '95.3%', bgcolor: 'background.default', borderRadius: 1 }}
+          sx={{ flex: 1, bgcolor: 'background.default', borderRadius: 1 }}
           placeholder="Search products..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -54,11 +66,84 @@ function ShopPage() { // main shop page, displays hearts for favorited items -Ny
             ),
           }}
         />
+        <Button
+          variant="outlined"
+          startIcon={<TuneIcon />}
+          size="small"
+          onClick={(e) => setFilterAnchorEl(e.currentTarget)}
+        >
+          Filters{activeFilterCount > 0 ? ` · ${activeFilterCount}` : ''}
+        </Button>
+        <Popover
+          open={Boolean(filterAnchorEl)}
+          anchorEl={filterAnchorEl}
+          onClose={() => setFilterAnchorEl(null)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        >
+          <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 2, minWidth: 220 }}>
+            <FormControl size="small" fullWidth>
+              <InputLabel>Sort By</InputLabel>
+              <Select value={sortBy} onChange={(e) => setSortBy(e.target.value)} label="Sort By">
+                <MenuItem value="default">Default</MenuItem>
+                <MenuItem value="price_asc">Price: Low → High</MenuItem>
+                <MenuItem value="price_desc">Price: High → Low</MenuItem>
+                <MenuItem value="name_asc">Name: A → Z</MenuItem>
+                <MenuItem value="name_desc">Name: Z → A</MenuItem>
+                <MenuItem value="rating_desc">Rating: High → Low</MenuItem>
+              </Select>
+            </FormControl>
+            <FormControl size="small" fullWidth>
+              <InputLabel>Price Range</InputLabel>
+              <Select value={priceRange} onChange={(e) => setPriceRange(e.target.value)} label="Price Range">
+                <MenuItem value="all">All Prices</MenuItem>
+                <MenuItem value="under_25">Under $25</MenuItem>
+                <MenuItem value="25_50">$25 – $50</MenuItem>
+                <MenuItem value="50_100">$50 – $100</MenuItem>
+                <MenuItem value="over_100">$100+</MenuItem>
+              </Select>
+            </FormControl>
+            <FormControl size="small" fullWidth>
+              <InputLabel>Status</InputLabel>
+              <Select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} label="Status">
+                <MenuItem value="all">All</MenuItem>
+                <MenuItem value="in_stock">In Stock Only</MenuItem>
+                <MenuItem value="on_sale">On Sale</MenuItem>
+              </Select>
+            </FormControl>
+            <FormControl size="small" fullWidth>
+              <InputLabel>Category</InputLabel>
+              {/* category filter: All first, then Everyday Thingz, then any API-driven categories -Ian */}
+              <Select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)} label="Category">
+                <MenuItem value="all">All Categories</MenuItem>
+                <MenuItem value="everyday_things">Everyday Thingz</MenuItem>
+                {availableCategories.map((cat) => (
+                  <MenuItem key={cat} value={cat}>{cat}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            {activeFilterCount > 0 && (
+              <Button size="small" onClick={() => {
+                setSortBy('default'); setPriceRange('all');
+                setStatusFilter('all'); setFilterCategory('all');
+              }}>
+                Clear All
+              </Button>
+            )}
+          </Box>
+        </Popover>
       </Container>
     </Box>
     <Container maxWidth="lg" sx={{ py: 4, flex: 1, display: 'flex', alignItems: 'center' }}>
       <Head title="Shop" />
-      <ShopItemList searchQuery={searchQuery} />
+      <ShopItemList
+        searchQuery={searchQuery}
+        sortBy={sortBy}
+        priceRange={priceRange}
+        statusFilter={statusFilter}
+        filterCategory={filterCategory}
+        onCategoriesLoaded={setAvailableCategories}
+      />
     </Container>
   </Box>
 };
