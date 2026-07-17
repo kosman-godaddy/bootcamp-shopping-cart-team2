@@ -8,6 +8,7 @@ import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import SearchIcon from '@mui/icons-material/Search';
 import TuneIcon from '@mui/icons-material/Tune';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import DarkModeToggle from '../components/DarkModeToggle';
 
 function ShopPage() { // main shop page, displays hearts for favorited items -Nyla
@@ -41,6 +42,11 @@ function ShopPage() { // main shop page, displays hearts for favorited items -Ny
           <Link href="/order-history" passHref>
             <Button variant="outlined" startIcon={<ReceiptLongIcon />} size="small">
               Order History
+            </Button>
+          </Link>
+          <Link href="/admin" passHref>
+            <Button variant="outlined" startIcon={<AdminPanelSettingsIcon />} size="small">
+              Admin
             </Button>
           </Link>
           <Link href="/cart" passHref>
