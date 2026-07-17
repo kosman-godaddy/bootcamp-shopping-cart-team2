@@ -44,6 +44,21 @@ function ShoppingItemList({ searchQuery = '' }) { // searchQuery comes from the 
     await fetchData();
   };
 
+  const handleDecrement = async (product) => {
+    const existing = cartItems.find((item) => item.name === product.name);
+    if (!existing) return;
+    if (existing.quantity > 1) {
+      await fetch(`http://localhost:8000/v1/cartitems/${existing.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ quantity: existing.quantity - 1 }),
+      });
+    } else {
+      await fetch(`http://localhost:8000/v1/cartitems/${existing.id}`, { method: 'DELETE' });
+    }
+    await fetchData();
+  };
+
   const getCartQuantity = (productName) => {
     const item = cartItems.find((ci) => ci.name === productName);
     return item ? item.quantity : 0;
@@ -56,18 +71,15 @@ function ShoppingItemList({ searchQuery = '' }) { // searchQuery comes from the 
 
   return (
     <Grid container direction="row" spacing={1} alignItems="flex-start">
-      {filteredProducts.map((product) => {
-        const stock = product.stock ?? 5;
-        const stockRemaining = stock - getCartQuantity(product.name);
-        return (
-          <ShopItem
-            key={product.id}
-            product={product}
-            onAddToCart={handleAddToCart}
-            stockRemaining={stockRemaining}
-          />
-        );
-      })}
+      {filteredProducts.map((product) => (
+        <ShopItem
+          key={product.id}
+          product={product}
+          onAddToCart={handleAddToCart}
+          onDecrement={handleDecrement}
+          cartQuantity={getCartQuantity(product.name)}
+        />
+      ))}
     </Grid>
   );
 }
