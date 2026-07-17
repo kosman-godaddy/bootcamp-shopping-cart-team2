@@ -8,6 +8,7 @@ import InventoryIcon from '@mui/icons-material/Inventory';
 import StarRoundedIcon from '@mui/icons-material/StarRounded';
 import { useFavorites } from '../context/FavoritesContext';
 
+// Fallback images keyed by product ID — only used when the product has no image_url in the DB -Ian
 const productImages = {
   1: 'https://images.unsplash.com/photo-1582139329536-e7284fece509?w=400&h=200&fit=crop', // padlock close-up
   2: 'https://images.unsplash.com/photo-1510511459019-5dda7724fd87?w=400&h=200&fit=crop', // network nodes / multiple connections
@@ -16,15 +17,16 @@ const productImages = {
   5: 'https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=400&h=200&fit=crop', // modern startup office
 };
 
+// Long-form descriptions shown in the collapsible details section; falls back to product.description for any ID not listed here -Ian
 const productDetails = {
   1: 'A Domain Validation (DV) SSL certificate that encrypts data between your visitors and your website. Once installed, browsers display a padlock in the address bar and serve your site over HTTPS — signaling to visitors that their connection is secure. Ideal for blogs, small business sites, and personal projects that handle logins or contact forms. Covers a single domain (e.g. example.com) and is typically issued within minutes.',
   2: 'A Wildcard SSL certificate secures your primary domain and an unlimited number of its subdomains (e.g. shop.example.com, mail.example.com, api.example.com) with a single certificate. This eliminates the cost and hassle of buying separate certificates for each subdomain. Perfect for growing businesses with multiple services or staging environments. Uses the same strong encryption as a standard certificate, just with broader coverage.',
   3: 'Register a .com domain — the world\'s most recognized top-level domain (TLD). A .com address is trusted by consumers worldwide and is ideal for businesses, e-commerce, and professional brands. Includes a full year of registration, free WHOIS privacy protection to keep your personal contact info hidden, and DNS management through GoDaddy\'s control panel. Renews annually at the standard rate.',
   4: 'Register a .org domain, widely recognized as the TLD of choice for nonprofits, charities, open-source projects, and community organizations. A .org address signals credibility and public purpose to your audience. Includes a full year of registration, WHOIS privacy, and full DNS control. Renews annually.',
   5: 'Register a .co domain — the rising alternative to .com favored by startups, tech companies, and entrepreneurs worldwide. Short, memorable, and globally understood as a business extension. A .co domain is a strong choice when your preferred .com is taken. Includes a full year of registration, WHOIS privacy protection, and complete DNS management. Currently on sale — a great time to lock in your brand.',
-  6: "Warning: may cause overwhelming joy. Glazed to perfection, these Donuts will make your Do'main experience all the better.",
-  7: "I know your sick of Ubering from the Hotel to the Office, why not just skip the wait!",
-  8: "FREE In-N-Out, Courtesy of Austin & Suzeth",
+  14: "Warning: may cause overwhelming joy. Glazed to perfection, these Donuts will make your Do'main experience all the better.",
+  15: "I know your sick of Ubering from the Hotel to the Office, why not just skip the wait!",
+  16: "FREE In-N-Out, Courtesy of Austin & Suzeth",
 };
 
 function ShopItem({ product, onAddToCart, stockRemaining = 5 }) {
@@ -47,6 +49,7 @@ function ShopItem({ product, onAddToCart, stockRemaining = 5 }) {
   const isFavorited = checkFavorited(product.id);
 
   const rating = product.rating != null ? Number(product.rating) : null;
+  // Three-tier color: green ≥4, orange ≥3, red below — grey when no rating exists -Ian
   const ratingColor = rating == null ? '#9e9e9e'
     : rating >= 4   ? '#2e7d32'
     : rating >= 3   ? '#f57c00'
@@ -146,13 +149,38 @@ function ShopItem({ product, onAddToCart, stockRemaining = 5 }) {
             WebkitBoxOrient: 'vertical',
             overflow: 'hidden',
             lineHeight: 1.55,
-            mb: 1.25,
+            mb: rating != null ? 1 : 1.25,
           }}
         >
           {product.description}
         </Typography>
 
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 0.5 }}>
+        {/* Color-coded star strip: left-border accent + gradient fade, green ≥4 / orange ≥3 / red below -Ian */}
+        {rating != null && (
+          <Box sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 0.5,
+            px: 1,
+            py: 0.45,
+            mb: 1,
+            borderRadius: 1.5,
+            background: `linear-gradient(90deg, ${ratingColor}18 0%, transparent 100%)`,
+            borderLeft: `3px solid ${ratingColor}`,
+          }}>
+            {/* Filled stars up to rounded rating, faded for the remainder -Ian */}
+            <Box sx={{ display: 'flex', gap: 0.2 }}>
+              {[1, 2, 3, 4, 5].map(i => (
+                <StarRoundedIcon key={i} sx={{ fontSize: 13, color: i <= Math.round(rating) ? ratingColor : ratingColor + '30' }} />
+              ))}
+            </Box>
+            <Typography variant="caption" fontWeight={800} sx={{ color: ratingColor, fontSize: '0.72rem', ml: 0.3, lineHeight: 1 }}>
+              {rating.toFixed(1)}
+            </Typography>
+          </Box>
+        )}
+
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
           {onSale ? (
             <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.5 }}>
               <Typography variant="subtitle1" fontWeight={800} color="error.main" sx={{ fontSize: '1rem' }}>
@@ -166,26 +194,6 @@ function ShopItem({ product, onAddToCart, stockRemaining = 5 }) {
             <Typography variant="subtitle1" fontWeight={800} color="text.primary" sx={{ fontSize: '1rem' }}>
               ${Number(product.price).toFixed(2)}
             </Typography>
-          )}
-
-          {rating != null && (
-            <Box sx={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 0.35,
-              px: 0.8,
-              py: 0.3,
-              borderRadius: 99,
-              bgcolor: ratingColor + '18',
-              border: '1px solid',
-              borderColor: ratingColor + '55',
-              flexShrink: 0,
-            }}>
-              <StarRoundedIcon sx={{ fontSize: 11, color: ratingColor }} />
-              <Typography variant="caption" fontWeight={800} sx={{ color: ratingColor, lineHeight: 1, fontSize: '0.7rem' }}>
-                {rating.toFixed(1)}
-              </Typography>
-            </Box>
           )}
         </Box>
       </CardContent>
@@ -218,22 +226,6 @@ function ShopItem({ product, onAddToCart, stockRemaining = 5 }) {
           <Typography variant="body2" color="text.secondary" sx={{ mb: 1, lineHeight: 1.6, fontSize: 12 }}>
             {productDetails[product.id] || product.description}
           </Typography>
-
-          {rating != null && (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 0.5 }}>
-              <Rating
-                value={rating}
-                precision={0.5}
-                size="small"
-                readOnly
-                icon={<StarRoundedIcon fontSize="inherit" sx={{ color: ratingColor }} />}
-                emptyIcon={<StarRoundedIcon fontSize="inherit" sx={{ opacity: 0.25 }} />}
-              />
-              <Typography variant="caption" sx={{ color: ratingColor, fontWeight: 600 }}>
-                {rating.toFixed(1)} / 5
-              </Typography>
-            </Box>
-          )}
 
           {/* Category chip - Ian */}
           {product.category && (

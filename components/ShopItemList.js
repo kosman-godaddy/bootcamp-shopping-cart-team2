@@ -23,6 +23,7 @@ function ShoppingItemList({ searchQuery = '', sortBy = 'default', priceRange = '
 
   useEffect(() => { fetchData(); }, []);
 
+  // Upserts the product into the cart: increments quantity if already present, otherwise creates a new cart item -Ian
   const handleAddToCart = async (product) => {
     const existing = cartItems.find((item) => item.name === product.name);
     if (existing) {
@@ -37,6 +38,7 @@ function ShoppingItemList({ searchQuery = '', sortBy = 'default', priceRange = '
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: product.name,
+          // Store the active price (sale or regular) so the cart total reflects the discount at the time of add -Ian
           price: product.is_on_sale && product.sale_price != null ? product.sale_price : product.price,
           original_price: product.is_on_sale && product.sale_price != null ? product.price : null,
           quantity: 1,
@@ -46,6 +48,7 @@ function ShoppingItemList({ searchQuery = '', sortBy = 'default', priceRange = '
     await fetchData();
   };
 
+  // Decrements by one; removes the cart item entirely when quantity would drop to zero -Ian
   const handleDecrement = async (product) => {
     const existing = cartItems.find((item) => item.name === product.name);
     if (!existing) return;
