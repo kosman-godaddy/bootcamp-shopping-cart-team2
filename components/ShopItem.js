@@ -247,7 +247,11 @@ function ShopItem({ product, onAddToCart, onDecrement, cartQuantity = 0 }) {
       </Collapse>
 
       <CardActions sx={{ px: 1.75, pb: 1.75, pt: 0.75 }}>
-        {cartQuantity === 0 ? (
+        {product.stock === 0 ? (
+          <Button variant="contained" fullWidth size="small" disableElevation disabled>
+            Out of Stock
+          </Button>
+        ) : cartQuantity === 0 ? (
           <Button
             onClick={handleAddToCartClick}
             variant="contained"
@@ -258,22 +262,30 @@ function ShopItem({ product, onAddToCart, onDecrement, cartQuantity = 0 }) {
             Add to Cart
           </Button>
         ) : (
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-            <IconButton
-              size="small"
-              onClick={() => onDecrement(product)}
-              sx={{ border: '1px solid', borderColor: 'divider' }}
-            >
-              <RemoveIcon fontSize="small" />
-            </IconButton>
-            <Typography variant="body2" fontWeight={700}>{cartQuantity}</Typography>
-            <IconButton
-              size="small"
-              onClick={() => onAddToCart(product)}
-              sx={{ border: '1px solid', borderColor: 'divider' }}
-            >
-              <AddIcon fontSize="small" />
-            </IconButton>
+          <Box sx={{ width: '100%' }}>
+            {product.stock != null && cartQuantity >= product.stock && (
+              <Typography variant="caption" color="error" fontWeight={600} sx={{ display: 'block', textAlign: 'center', mb: 0.75 }}>
+                Out of Stock
+              </Typography>
+            )}
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+              <IconButton
+                size="small"
+                onClick={() => onDecrement(product)}
+                sx={{ border: '1px solid', borderColor: 'divider' }}
+              >
+                <RemoveIcon fontSize="small" />
+              </IconButton>
+              <Typography variant="body2" fontWeight={700}>{cartQuantity}</Typography>
+              <IconButton
+                size="small"
+                onClick={() => onAddToCart(product)}
+                disabled={product.stock != null && cartQuantity >= product.stock}
+                sx={{ border: '1px solid', borderColor: 'divider' }}
+              >
+                <AddIcon fontSize="small" />
+              </IconButton>
+            </Box>
           </Box>
         )}
       </CardActions>

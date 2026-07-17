@@ -26,6 +26,8 @@ function ShoppingItemList({ searchQuery = '', sortBy = 'default', priceRange = '
   // Upserts the product into the cart: increments quantity if already present, otherwise creates a new cart item -Ian
   const handleAddToCart = async (product) => {
     const existing = cartItems.find((item) => item.name === product.name);
+    const currentQty = existing ? existing.quantity : 0;
+    if (product.stock != null && currentQty >= product.stock) return;
     if (existing) {
       await fetch(`http://localhost:8000/v1/cartitems/${existing.id}`, {
         method: 'PATCH',
