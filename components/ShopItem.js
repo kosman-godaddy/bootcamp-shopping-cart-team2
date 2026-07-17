@@ -48,6 +48,7 @@ function ShopItem({ product, onAddToCart, onDecrement, cartQuantity = 0 }) {
   const onSale = product.is_on_sale && product.sale_price != null;
   const isFavorited = checkFavorited(product.id);
 
+  // Ratings seeded directly into the DB via PATCH for all 8 products (3.9–5.0); strip hidden when null -Ian
   const rating = product.rating != null ? Number(product.rating) : null;
   // Three-tier color: green ≥4, orange ≥3, red below — grey when no rating exists -Ian
   const ratingColor = rating == null ? '#9e9e9e'

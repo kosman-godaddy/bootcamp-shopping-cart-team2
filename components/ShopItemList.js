@@ -64,6 +64,7 @@ function ShoppingItemList({ searchQuery = '', sortBy = 'default', priceRange = '
     await fetchData();
   };
 
+  // Orphaned "Cool Test Item" cart entries (IDs 39–48) cleared via DELETE — those were leftover test data -Ian
   const getCartQuantity = (productName) => {
     const item = cartItems.find((ci) => ci.name === productName);
     return item ? item.quantity : 0;
